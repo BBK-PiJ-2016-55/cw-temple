@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>FindBugs Report</title>
+<style type="text/css">
+        .tablerow0 {
+            background: #EEEEEE;
+        }
+
+        .tablerow1 {
+            background: white;
+        }
+
+        .detailrow0 {
+            background: #EEEEEE;
+        }
+
+        .detailrow1 {
+            background: white;
+        }
+        .long_message {
+            color:#220001;
+            background: -moz-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,0.96) 24%, rgba(255,255,255,1) 25%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(255,255,255,0)), color-stop(24%,rgba(255,255,255,0.96)), color-stop(25%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%,rgba(255,255,255,0.96) 24%,rgba(255,255,255,1) 25%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(left, rgba(255,255,255,0) 0%,rgba(255,255,255,0.96) 24%,rgba(255,255,255,1) 25%,rgba(255,255,255,0) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(left, rgba(255,255,255,0) 0%,rgba(255,255,255,0.96) 24%,rgba(255,255,255,1) 25%,rgba(255,255,255,0) 100%); /* IE10+ */
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%,rgba(255,255,255,0.96) 24%,rgba(255,255,255,1) 25%,rgba(255,255,255,0) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 */
+        }
+
+        .tableheader {
+            font-size: larger;
+            background: -moz-linear-gradient(left,  rgba(135,224,253,1) 0%, rgba(83,203,241,0.9) 40%, rgba(59,4,153,0.75) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(135,224,253,1)), color-stop(40%,rgba(83,203,241,0.9)), color-stop(100%,rgba(59,4,153,0.75))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(left,  rgba(135,224,253,1) 0%,rgba(83,203,241,0.9) 40%,rgba(59,4,153,0.75) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(left,  rgba(135,224,253,1) 0%,rgba(83,203,241,0.9) 40%,rgba(59,4,153,0.75) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(left,  rgba(135,224,253,1) 0%,rgba(83,203,241,0.9) 40%,rgba(59,4,153,0.75) 100%); /* IE10+ */
+            background: linear-gradient(to right,  rgba(135,224,253,1) 0%,rgba(83,203,241,0.9) 40%,rgba(59,4,153,0.75) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#87e0fd', endColorstr='#bf3b0499',GradientType=1 ); /* IE6-9 */
+
+        }
+        .high {
+            background: -moz-linear-gradient(top, rgba(239,187,110,0.93) 0%, rgba(255,26,0,0.97) 52%, rgba(239,187,110,1) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(239,187,110,0.93)), color-stop(52%,rgba(255,26,0,0.97)), color-stop(100%,rgba(239,187,110,1))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top, rgba(239,187,110,0.93) 0%,rgba(255,26,0,0.97) 52%,rgba(239,187,110,1) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top, rgba(239,187,110,0.93) 0%,rgba(255,26,0,0.97) 52%,rgba(239,187,110,1) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top, rgba(239,187,110,0.93) 0%,rgba(255,26,0,0.97) 52%,rgba(239,187,110,1) 100%); /* IE10+ */
+            background: linear-gradient(to bottom, rgba(239,187,110,0.93) 0%,rgba(255,26,0,0.97) 52%,rgba(239,187,110,1) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#edefbb6e', endColorstr='#efbb6e',GradientType=0 ); /* IE6-9 */
+        }
+        .medium {
+            background: -moz-linear-gradient(top, rgba(244,232,117,1) 0%, rgba(239,187,110,0.96) 52%, rgba(244,232,117,0.93) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(244,232,117,1)), color-stop(52%,rgba(239,187,110,0.96)), color-stop(100%,rgba(244,232,117,0.93))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top, rgba(244,232,117,1) 0%,rgba(239,187,110,0.96) 52%,rgba(244,232,117,0.93) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top, rgba(244,232,117,1) 0%,rgba(239,187,110,0.96) 52%,rgba(244,232,117,0.93) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top, rgba(244,232,117,1) 0%,rgba(239,187,110,0.96) 52%,rgba(244,232,117,0.93) 100%); /* IE10+ */
+            background: linear-gradient(to bottom, rgba(244,232,117,1) 0%,rgba(239,187,110,0.96) 52%,rgba(244,232,117,0.93) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4e875', endColorstr='#edf4e875',GradientType=0 ); /* IE6-9 */
+        }
+        .low {
+            background: -moz-linear-gradient(top, rgba(244,232,117,0.93) 0%, rgba(140,186,124,0.97) 53%, rgba(244,232,117,1) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(244,232,117,0.93)), color-stop(53%,rgba(140,186,124,0.97)), color-stop(100%,rgba(244,232,117,1))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top, rgba(244,232,117,0.93) 0%,rgba(140,186,124,0.97) 53%,rgba(244,232,117,1) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top, rgba(244,232,117,0.93) 0%,rgba(140,186,124,0.97) 53%,rgba(244,232,117,1) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top, rgba(244,232,117,0.93) 0%,rgba(140,186,124,0.97) 53%,rgba(244,232,117,1) 100%); /* IE10+ */
+            background: linear-gradient(to bottom, rgba(244,232,117,0.93) 0%,rgba(140,186,124,0.97) 53%,rgba(244,232,117,1) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#edf4e875', endColorstr='#f4e875',GradientType=0 ); /* IE6-9 */
+        }
+        pre {
+            font-family: "Bitstream Vera Sans Mono", Consolas, Inconsolata, "Lucida Console", "Courier New", Monospace !important;
+            box-shadow: 0 0;
+            color: black;
+            border-width: 1px 1px 1px 6px;
+            border-style: solid;
+            padding: 2ex;
+            margin: 2ex 2ex 2ex 2ex;
+            overflow: auto;
+            -moz-border-radius: 0px;
+            -webkit-border-radius: 0px;
+            -khtml-border-radius: 0px;
+            border-radius: 0px;
+            border-color: #996666;
+
+            background: rgb(232,239,244); /* Old browsers */
+            background: -moz-linear-gradient(left, rgba(232,239,244,1) 1%, rgba(244,249,249,1) 23%, rgba(249,250,246,1) 87%, rgba(241,242,236,1) 98%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, right top, color-stop(1%,rgba(232,239,244,1)), color-stop(23%,rgba(244,249,249,1)), color-stop(87%,rgba(249,250,246,1)), color-stop(98%,rgba(241,242,236,1))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(left, rgba(232,239,244,1) 1%,rgba(244,249,249,1) 23%,rgba(249,250,246,1) 87%,rgba(241,242,236,1) 98%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(left, rgba(232,239,244,1) 1%,rgba(244,249,249,1) 23%,rgba(249,250,246,1) 87%,rgba(241,242,236,1) 98%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(left, rgba(232,239,244,1) 1%,rgba(244,249,249,1) 23%,rgba(249,250,246,1) 87%,rgba(241,242,236,1) 98%); /* IE10+ */
+            background: linear-gradient(to right, rgba(232,239,244,1) 1%,rgba(244,249,249,1) 23%,rgba(249,250,246,1) 87%,rgba(241,242,236,1) 98%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e8eff4', endColorstr='#f1f2ec',GradientType=1 ); /* IE6-9 */
+        }
+        </style>
+</head>
+<body>
+<h1>FindBugs Report</h1>
+<p>Produced using <a href="http://findbugs.sourceforge.net">FindBugs </a>3.0.1.</p>
+<p>Project:
+            </p>
+<table style="width:90%;">
+<tr>
+<td>
+<h2>Metrics</h2>
+<p>1747 lines of code analysed,
+    in 47 classes,
+    in 5 packages.</p>
+<table cellpadding="5" cellspacing="2" style="width:90%;border-collapse: collapse;border-style:solid;border-width:thin;">
+<tr class="tableheader">
+<th align="left">Metric</th>
+<th align="right">Total</th>
+<th align="right">Density*</th>
+</tr>
+<tr class="high">
+<td>High Priority Warnings</td>
+<td align="right">4</td>
+<td align="right">2.29</td>
+</tr>
+<tr class="medium">
+<td>Medium Priority Warnings</td>
+<td align="right"/>
+<td align="right">NaN</td>
+</tr>
+<tr bgcolor="#f0f0f0">
+<td>
+<b>Total Warnings</b>
+</td>
+<td align="right">
+<b>4</b>
+</td>
+<td align="right">
+<b>2.29</b>
+</td>
+</tr>
+</table>
+<p>
+<i>(* Defects per thousand lines of non-commenting source statements)</i>
+</p>
+<p>
+<br/>
+<br/>
+</p>
+</td>
+<td>
+<h2>Summary</h2>
+<table cellpadding="5" cellspacing="2" style="width:90%;border-collapse: collapse;border-style:solid;border-width:thin;">
+<tr class="tableheader">
+<th align="left">Warning Type</th>
+<th align="right">Number</th>
+</tr>
+<tr class="tablerow0">
+<td>
+<a href="#Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+</td>
+<td align="right">2</td>
+</tr>
+<tr class="tablerow1">
+<td>
+<a href="#Warnings_STYLE">Dodgy code Warnings</a>
+</td>
+<td align="right">2</td>
+</tr>
+<tr class="tablerow0">
+<td>
+<b>Total</b>
+</td>
+<td align="right">
+<b>4</b>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<p>
+<br/>
+<br/>
+</p>
+<h1>Warnings</h1>
+<p>Click on each warning link to see a full description of the issue, and
+        details of how to resolve it.</p>
+<h2>
+<a name="Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+</h2>
+<table class="warningtable" cellspacing="2" cellpadding="5" style="width:100%;border-collapse: collapse;border-style:solid;border-width:thin;">
+<tr class="tableheader">
+<th align="left">Warning</th>
+<th align="center">Priority</th>
+<th align="left">Details</th>
+</tr>
+<tr class="high">
+<td width="20%" valign="top">
+<a href="#CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE">Class defines clone() but doesn't implement Cloneable</a>
+</td>
+<td width="10%" valign="top" align="center">
+<strong>High</strong>
+</td>
+<td width="70%">
+<dl>
+<dt class="long_message">searchexample.Maze defines clone() but doesn't implement Cloneable</dt>
+<dd>
+                        In file <tt>
+<strong>Maze.java</strong>
+</tt>,
+                        
+                            lines 112
+                                to 118<br/>In class searchexample.Maze<br/>In method searchexample.Maze.clone()<br/>At Maze.java:[lines 112-118]</dd>
+</dl>
+</td>
+</tr>
+<tr class="high">
+<td width="20%" valign="top">
+<a href="#DMI_RANDOM_USED_ONLY_ONCE">Random object created and used only once</a>
+</td>
+<td width="10%" valign="top" align="center">
+<strong>High</strong>
+</td>
+<td width="70%">
+<dl>
+<dt class="long_message">Random object created and used only once in new game.GameState(boolean)</dt>
+<dd>
+                        In file <tt>
+<strong>GameState.java</strong>
+</tt>,
+                        
+                            line 72<br/>In class game.GameState<br/>In method new game.GameState(boolean)<br/>Called method java.util.Random.nextLong()<br/>At GameState.java:[line 72]</dd>
+</dl>
+</td>
+</tr>
+</table>
+<p>
+<br/>
+<br/>
+</p>
+<h2>
+<a name="Warnings_STYLE">Dodgy code Warnings</a>
+</h2>
+<table class="warningtable" cellspacing="2" cellpadding="5" style="width:100%;border-collapse: collapse;border-style:solid;border-width:thin;">
+<tr class="tableheader">
+<th align="left">Warning</th>
+<th align="center">Priority</th>
+<th align="left">Details</th>
+</tr>
+<tr class="high">
+<td width="20%" valign="top">
+<a href="#ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD">Write to static field from instance method</a>
+</td>
+<td width="10%" valign="top" align="center">
+<strong>High</strong>
+</td>
+<td width="70%">
+<dl>
+<dt class="long_message">Write to static field gui.MazePanel.TILE_HEIGHT from instance method new gui.MazePanel(Cavern, int, int, GUI)</dt>
+<dd>
+                        In file <tt>
+<strong>MazePanel.java</strong>
+</tt>,
+                        
+                            line 83<br/>In class gui.MazePanel<br/>In method new gui.MazePanel(Cavern, int, int, GUI)<br/>Field gui.MazePanel.TILE_HEIGHT<br/>At MazePanel.java:[line 83]<br/>Another occurrence at MazePanel.java:[line 86]</dd>
+</dl>
+</td>
+</tr>
+<tr class="high">
+<td width="20%" valign="top">
+<a href="#ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD">Write to static field from instance method</a>
+</td>
+<td width="10%" valign="top" align="center">
+<strong>High</strong>
+</td>
+<td width="70%">
+<dl>
+<dt class="long_message">Write to static field gui.MazePanel.TILE_WIDTH from instance method new gui.MazePanel(Cavern, int, int, GUI)</dt>
+<dd>
+                        In file <tt>
+<strong>MazePanel.java</strong>
+</tt>,
+                        
+                            line 82<br/>In class gui.MazePanel<br/>In method new gui.MazePanel(Cavern, int, int, GUI)<br/>Field gui.MazePanel.TILE_WIDTH<br/>At MazePanel.java:[line 82]<br/>Another occurrence at MazePanel.java:[line 85]</dd>
+</dl>
+</td>
+</tr>
+</table>
+<p>
+<br/>
+<br/>
+</p>
+<p>
+<br/>
+<br/>
+</p>
+<h1>
+<a name="Details">Warning Types</a>
+</h1>
+<h2>
+<a name="CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE">Class defines clone() but doesn't implement Cloneable</a>
+</h2>
+
+<p> This class defines a clone() method but the class doesn't implement Cloneable.
+There are some situations in which this is OK (e.g., you want to control how subclasses
+can clone themselves), but just make sure that this is what you intended.
+</p>
+
+    
+<p>
+<br/>
+<br/>
+</p>
+<h2>
+<a name="DMI_RANDOM_USED_ONLY_ONCE">Random object created and used only once</a>
+</h2>
+
+<p> This code creates a java.util.Random object, uses it to generate one random number, and then discards
+the Random object. This produces mediocre quality random numbers and is inefficient.
+If possible, rewrite the code so that the Random object is created once and saved, and each time a new random number
+is required invoke a method on the existing Random object to obtain it.
+</p>
+
+<p>If it is important that the generated Random numbers not be guessable, you <em>must</em> not create a new Random for each random
+number; the values are too easily guessable. You should strongly consider using a java.security.SecureRandom instead
+(and avoid allocating a new SecureRandom for each random number needed).
+</p>
+
+    
+<p>
+<br/>
+<br/>
+</p>
+<h2>
+<a name="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD">Write to static field from instance method</a>
+</h2>
+
+  <p> This instance method writes to a static field. This is tricky to get
+correct if multiple instances are being manipulated,
+and generally bad practice.
+</p>
+
+    
+<p>
+<br/>
+<br/>
+</p>
+</body>
+</html>
