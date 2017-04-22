@@ -1,18 +1,15 @@
 package student;
 
-import game.EscapeState;
-import game.ExplorationState;
-import game.NodeStatus;
+import game.*;
+import game.Tile;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class Explorer {
   private Stack<Long> visitedTiles = new Stack<>();
   // todo - what's the best collection for neighbourTiles?
-  private List<Long> neighbourTiles = new ArrayList<>();
+  private List<NodeStatus> neighbourTiles = new ArrayList<>();
+  private List<Long> unvisitedTiles = new ArrayList<>();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -46,19 +43,30 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
-      List<NodeStatus> neighbourTemp = new ArrayList<>();
       // get current location and add ID to visited tile stack
       visitedTiles.add(state.getCurrentLocation());
-      // todo: remove from unvisited if it's there... need data structure w easy search and remove func
-      if (neighbourTiles.contains(visitedTiles.peek())) {
-        neighbourTiles.remove(visitedTiles.peek());
+      List<NodeStatus> neighbourTemp = (List<NodeStatus>) state.getNeighbours();
+      // remove from unvisited if it's there...
+      if (unvisitedTiles.contains(visitedTiles.peek())) {
+        unvisitedTiles.remove(visitedTiles.peek());
       } else {
-        // todo: get list of unvisited, non-wall neighbours and add to some as yet tbc data structure
-        neighbourTemp = (List<NodeStatus>) state.getNeighbours();
-        for (n : neighbourTemp) {
-          if (n.getId().getTile().getType(). )
+        // get list of unvisited, (non-wall?) neighbours and add to temp data structure
+        for (NodeStatus n : neighbourTemp) {
+          if (!visitedTiles.contains(n.getId())) {
+            unvisitedTiles.add(n.getId());
+          } else {
+            neighbourTemp.remove(n);
+          }
         }
-        // todo: move to the one with the lowest distance to the orb
+        // move to the one with the lowest distance to the orb
+        if (!neighbourTemp.isEmpty()) {
+          neighbourTemp.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
+          state.moveTo(neighbourTemp.get(0).getId());
+          neighbourTemp.clear();
+        } else {
+          state.moveTo(visitedTiles.peek());
+          neighbourTemp.clear();
+        }
       }
     }
   }
