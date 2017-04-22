@@ -43,42 +43,39 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
-      // get current location and add ID to visited tile stack
-      visitedTiles.add(state.getCurrentLocation());
-      // remove from unvisited if it's there...
-      if (unvisitedTiles.contains(visitedTiles.peek())) {
-        unvisitedTiles.remove(visitedTiles.peek());
-        System.out.println("Current tile removed from unvisited");
-      }
-      neighbourTiles = (List<NodeStatus>) state.getNeighbours();
-      // get list of unvisited, (non-wall?) neighbours and add to temp data structure
-      for (NodeStatus n : neighbourTiles) {
-          if (!visitedTiles.contains(n.getId())) {
-              unvisitedTiles.add(n.getId());
-          } else {
-              neighbourTiles.remove(n);
-          }
-      }
-      }
-        // move to the one with the lowest distance to the orb
-        if (!neighbourTiles.isEmpty()) {
-          neighbourTiles.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
-          state.moveTo(neighbourTiles.get(0).getId());
-          neighbourTiles.clear();
-        } else {
-          state.moveTo(visitedTiles.peek());
-          neighbourTiles.clear();
+        // get current location and add ID to visited tile stack
+        visitedTiles.add(state.getCurrentLocation());
+        List<NodeStatus> tempNeighbour = new ArrayList<>();
+        // remove from unvisited if it's there...
+        if (unvisitedTiles.contains(visitedTiles.peek())) {
+            unvisitedTiles.remove(visitedTiles.peek());
+            System.out.println("Current tile removed from unvisited");
         }
+
+        neighbourTiles = (List<NodeStatus>) state.getNeighbours();
+        System.out.println("Size of neighbourTiles = " + neighbourTiles.size());
+        // get list of unvisited, (non-wall?) neighbours and add to temp data structure
+        for (NodeStatus n : neighbourTiles) {
+            if ((!visitedTiles.contains(n.getId()) && (!unvisitedTiles.contains(n.getId())))) {
+                unvisitedTiles.add(n.getId());
+                tempNeighbour.add(n);
+                System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
+            }
+        }
+
+        // find the neighbour with the lowest distance to the orb
+        if (!tempNeighbour.isEmpty()) {
+            tempNeighbour.sort(Comparator.comparing(node -> node.getDistanceToTarget()));
+            System.out.println("Moving to: " + tempNeighbour.get(0).getId());
+            state.moveTo(tempNeighbour.get(0).getId());
+            neighbourTiles.clear();
+        } else {
+            state.moveTo(visitedTiles.peek());
+            neighbourTiles.clear();
+        }
+    }
       }
 
-//  private List<Long> unvisitedNeighbours(List<NodeStatus> neighbours) {
-//      for (NodeStatus n : neighbours) {
-//          if (!visitedTiles.contains(n.getId())) {
-//              unvisitedTiles.add(n.getId());
-//          }
-//      }
-//          return unvisitedTiles;
-//  }
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
