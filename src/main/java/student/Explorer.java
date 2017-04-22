@@ -2,8 +2,17 @@ package student;
 
 import game.EscapeState;
 import game.ExplorationState;
+import game.NodeStatus;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Stack;
 
 public class Explorer {
+  private Stack<Long> visitedTiles = new Stack<>();
+  // todo - what's the best collection for neighbourTiles?
+  private List<Long> neighbourTiles = new ArrayList<>();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -36,7 +45,22 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-    //TODO:
+    while (state.getDistanceToTarget() != 0) {
+      List<NodeStatus> neighbourTemp = new ArrayList<>();
+      // get current location and add ID to visited tile stack
+      visitedTiles.add(state.getCurrentLocation());
+      // todo: remove from unvisited if it's there... need data structure w easy search and remove func
+      if (neighbourTiles.contains(visitedTiles.peek())) {
+        neighbourTiles.remove(visitedTiles.peek());
+      } else {
+        // todo: get list of unvisited, non-wall neighbours and add to some as yet tbc data structure
+        neighbourTemp = (List<NodeStatus>) state.getNeighbours();
+        for (n : neighbourTemp) {
+          if (n.getId().getTile().getType(). )
+        }
+        // todo: move to the one with the lowest distance to the orb
+      }
+    }
   }
 
   /**
