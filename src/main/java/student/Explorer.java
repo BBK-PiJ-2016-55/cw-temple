@@ -45,31 +45,40 @@ public class Explorer {
     while (state.getDistanceToTarget() != 0) {
       // get current location and add ID to visited tile stack
       visitedTiles.add(state.getCurrentLocation());
-      List<NodeStatus> neighbourTemp = (List<NodeStatus>) state.getNeighbours();
       // remove from unvisited if it's there...
       if (unvisitedTiles.contains(visitedTiles.peek())) {
         unvisitedTiles.remove(visitedTiles.peek());
-      } else {
-        // get list of unvisited, (non-wall?) neighbours and add to temp data structure
-        for (NodeStatus n : neighbourTemp) {
+        System.out.println("Current tile removed from unvisited");
+      }
+      neighbourTiles = (List<NodeStatus>) state.getNeighbours();
+      // get list of unvisited, (non-wall?) neighbours and add to temp data structure
+      for (NodeStatus n : neighbourTiles) {
           if (!visitedTiles.contains(n.getId())) {
-            unvisitedTiles.add(n.getId());
+              unvisitedTiles.add(n.getId());
           } else {
-            neighbourTemp.remove(n);
+              neighbourTiles.remove(n);
           }
-        }
+      }
+      }
         // move to the one with the lowest distance to the orb
-        if (!neighbourTemp.isEmpty()) {
-          neighbourTemp.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
-          state.moveTo(neighbourTemp.get(0).getId());
-          neighbourTemp.clear();
+        if (!neighbourTiles.isEmpty()) {
+          neighbourTiles.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
+          state.moveTo(neighbourTiles.get(0).getId());
+          neighbourTiles.clear();
         } else {
           state.moveTo(visitedTiles.peek());
-          neighbourTemp.clear();
+          neighbourTiles.clear();
         }
       }
-    }
-  }
+
+//  private List<Long> unvisitedNeighbours(List<NodeStatus> neighbours) {
+//      for (NodeStatus n : neighbours) {
+//          if (!visitedTiles.contains(n.getId())) {
+//              unvisitedTiles.add(n.getId());
+//          }
+//      }
+//          return unvisitedTiles;
+//  }
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
