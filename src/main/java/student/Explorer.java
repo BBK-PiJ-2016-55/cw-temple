@@ -48,28 +48,28 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
-      // Create a new node for current tile
+      // todo - get rid of the distance field in caveMap unless used later
+      // Create new node with useful env info of current position
       CaveNode currentNode = new CaveNodeImpl(state.getCurrentLocation(),
               state.getDistanceToTarget());
-      // Add current node to caveMap and currentRoute stack
       currentRoute.add(currentNode);
       caveMap.put(currentNode.getId(), currentNode);
+
       // Find unvisited neighbours
       List<NodeStatus> tempNeighbours = newNeighbours(state.getNeighbours());
+
       // Find the neighbour with the lowest distance to the orb and go to it
       if (!tempNeighbours.isEmpty()) {
-        state.moveTo(nearestNeighbour(tempNeighbours));
-      // If you're in a dead end, go back...
+        tempNeighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
+        state.moveTo(tempNeighbours.get(0).getId());
+
+      // If you're at a dead end, go back...
+      // todo - any better way of dealing with this? e.g., reverse when moving away from orb for some time...
       } else {
         currentRoute.pop();
         state.moveTo(currentRoute.pop().getId());
       }
     }
-  }
-
-  private long nearestNeighbour(List<NodeStatus> neighbours) {
-    neighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
-    return neighbours.get(0).getId();
   }
 
   private List<NodeStatus> newNeighbours(Collection<NodeStatus> neighbours) {
