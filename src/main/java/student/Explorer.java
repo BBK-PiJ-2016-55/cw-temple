@@ -7,9 +7,8 @@ import java.util.*;
 
 public class Explorer {
   private Stack<Long> visitedTiles = new Stack<>();
-  // todo - what's the best collection for neighbourTiles?
-  private List<NodeStatus> neighbourTiles = new ArrayList<>();
   private List<Long> unvisitedTiles = new ArrayList<>();
+  private Collection<NodeStatus> neighbourTiles = new ArrayList<>();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -43,40 +42,59 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
-        // get current location and add ID to visited tile stack
-        visitedTiles.add(state.getCurrentLocation());
-        List<NodeStatus> tempNeighbour = new ArrayList<>();
-        // remove from unvisited if it's there...
-        if (unvisitedTiles.contains(visitedTiles.peek())) {
-            unvisitedTiles.remove(visitedTiles.peek());
-            System.out.println("Current tile removed from unvisited");
-        }
 
-        neighbourTiles = (List<NodeStatus>) state.getNeighbours();
+
+        // Add current location ID to visited tile stack
+        visitedTiles.add(state.getCurrentLocation());
+        neighbourTiles = state.getNeighbours();
+
         System.out.println("Size of neighbourTiles = " + neighbourTiles.size());
-        // get list of unvisited, (non-wall?) neighbours and add to temp data structure
-        for (NodeStatus n : neighbourTiles) {
-            if ((!visitedTiles.contains(n.getId()) && (!unvisitedTiles.contains(n.getId())))) {
-                unvisitedTiles.add(n.getId());
-                tempNeighbour.add(n);
-                System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
-            }
-        }
+        List<NodeStatus> tempNeighbour = newNeighbours(neighbourTiles);
+        // get list of unvisited neighbours and adds to tempNeighbour
+//        for (NodeStatus n : neighbourTiles) {
+//            if ((!visitedTiles.contains(n.getId()))) {
+//                unvisitedTiles.add(n.getId());
+//                tempNeighbour.add(n);
+//                System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
+//            }
+//        }
 
         // find the neighbour with the lowest distance to the orb
         if (!tempNeighbour.isEmpty()) {
             tempNeighbour.sort(Comparator.comparing(node -> node.getDistanceToTarget()));
-            System.out.println("Moving to: " + tempNeighbour.get(0).getId());
-            state.moveTo(tempNeighbour.get(0).getId());
+            long nearestNeigh = tempNeighbour.get(0).getId();
+            System.out.println("Moving to: " + nearestNeigh);
+            state.moveTo(nearestNeigh);
             neighbourTiles.clear();
         } else {
+            // retraceSteps();
+            System.out.println("Peek at visited tiles is..." + visitedTiles.peek());
+            // need some way of marking tile visited without it being the *last* visited
             state.moveTo(visitedTiles.peek());
-            neighbourTiles.clear();
         }
     }
       }
 
+    public List<NodeStatus> newNeighbours(Collection<NodeStatus> neighbours) {
+        List<NodeStatus> tempNeighbour = new ArrayList<>();
 
+        for (NodeStatus n : neighbours) {
+          if ((!visitedTiles.contains(n.getId()))) {
+            unvisitedTiles.add(n.getId());
+            tempNeighbour.add(n);
+            System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
+          }
+        }
+        return tempNeighbour;
+    }
+
+
+//    public void retraceSteps() {
+//        Stack<Long> lastRoute = (Stack<Long>) visitedTiles.clone();
+//         for (long id : lastRoute) {
+//
+//         }
+//    }
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
    * gold as possible along the way. Your solution must ALWAYS escape before time runs
