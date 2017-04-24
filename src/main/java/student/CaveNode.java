@@ -9,8 +9,6 @@ public interface CaveNode {
 
   int getDistance();
 
-  void setDistance(int distance);
-
   boolean visited();
 
   boolean setVisited(boolean visited);

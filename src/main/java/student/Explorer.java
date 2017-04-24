@@ -8,8 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Explorer {
   private Stack<CaveNode> currentRoute = new Stack<>();
   private Map<Long, CaveNode> caveMap = new ConcurrentHashMap<>();
-  private List<Long> unvisitedTiles = new ArrayList<>();
-  private Collection<NodeStatus> neighbourTiles = new ArrayList<>();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -43,25 +41,17 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
-
       // Create a new node for current tile
-      CaveNode currentNode = new CaveNodeImpl(state.getCurrentLocation());
-
-      // Add current node and env info to caveMap and visited tile stack
-      currentNode.setDistance(state.getDistanceToTarget());
+      CaveNode currentNode = new CaveNodeImpl(state.getCurrentLocation(),
+              state.getDistanceToTarget());
+      // Add current node to caveMap and currentRoute stack
       currentRoute.add(currentNode);
       caveMap.put(currentNode.getId(), currentNode);
-
-      // Get neighbours for current pos
-      neighbourTiles = state.getNeighbours();
-
-      // Filter out any already visited tiles
-      List<NodeStatus> tempNeighbour = newNeighbours(neighbourTiles);
-
+      // Find unvisited neighbours
+      List<NodeStatus> tempNeighbours = newNeighbours(state.getNeighbours());
       // Find the neighbour with the lowest distance to the orb and go to it
-      if (!tempNeighbour.isEmpty()) {
-        state.moveTo(nearestNeighbour(tempNeighbour));
-        neighbourTiles.clear();
+      if (!tempNeighbours.isEmpty()) {
+        state.moveTo(nearestNeighbour(tempNeighbours));
       // If you're in a dead end, go back...
       } else {
         currentRoute.pop();
@@ -70,20 +60,19 @@ public class Explorer {
     }
   }
 
-  public long nearestNeighbour(List<NodeStatus> neighbours) {
+  private long nearestNeighbour(List<NodeStatus> neighbours) {
     neighbours.sort(Comparator.comparing(node -> node.getDistanceToTarget()));
     return neighbours.get(0).getId();
   }
 
-  public List<NodeStatus> newNeighbours(Collection<NodeStatus> neighbours) {
-    List<NodeStatus> tempNeighbour = new ArrayList<>();
-    // Return a list of unvisited neighbours
+  private List<NodeStatus> newNeighbours(Collection<NodeStatus> neighbours) {
+    List<NodeStatus> tempNeighbours = new ArrayList<>();
     for (NodeStatus n : neighbours) {
       if ((!caveMap.containsKey(n.getId()))) {
-        tempNeighbour.add(n);
+        tempNeighbours.add(n);
       }
     }
-    return tempNeighbour;
+    return tempNeighbours;
   }
 
   /**

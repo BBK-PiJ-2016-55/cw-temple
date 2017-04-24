@@ -8,8 +8,9 @@ public class CaveNodeImpl implements CaveNode {
   private boolean visited = true;
   private int distanceToOrb;
 
-  public CaveNodeImpl(long id) {
-      this.id = id;
+  CaveNodeImpl(long id, int distancetoOrb) {
+    this.id = id;
+    this.distanceToOrb = distanceToOrb;
   }
 
   @Override
@@ -23,11 +24,6 @@ public class CaveNodeImpl implements CaveNode {
   }
 
   @Override
-  public void setDistance(int distanceToOrb) {
-    this.distanceToOrb = distanceToOrb;
-  }
-
-  @Override
   public boolean visited() {
     return visited;
   }
@@ -35,5 +31,5 @@ public class CaveNodeImpl implements CaveNode {
   @Override
   public boolean setVisited(boolean visited) {
     return false;
-    }
+  }
 }
