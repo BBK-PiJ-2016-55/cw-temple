@@ -45,48 +45,48 @@ public class Explorer {
 
 
         // Add current location ID to visited tile stack
-        visitedTiles.add(state.getCurrentLocation());
-        neighbourTiles = state.getNeighbours();
+      visitedTiles.add(state.getCurrentLocation());
+      neighbourTiles = state.getNeighbours();
 
-        System.out.println("Size of neighbourTiles = " + neighbourTiles.size());
-        List<NodeStatus> tempNeighbour = newNeighbours(neighbourTiles);
-        // get list of unvisited neighbours and adds to tempNeighbour
+      System.out.println("Size of neighbourTiles = " + neighbourTiles.size());
+      List<NodeStatus> tempNeighbour = newNeighbours(neighbourTiles);
+      // get list of unvisited neighbours and adds to tempNeighbour
 //        for (NodeStatus n : neighbourTiles) {
 //            if ((!visitedTiles.contains(n.getId()))) {
 //                unvisitedTiles.add(n.getId());
 //                tempNeighbour.add(n);
 //                System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
 //            }
-//        }
+//  }
 
-        // find the neighbour with the lowest distance to the orb
-        if (!tempNeighbour.isEmpty()) {
-            tempNeighbour.sort(Comparator.comparing(node -> node.getDistanceToTarget()));
-            long nearestNeigh = tempNeighbour.get(0).getId();
-            System.out.println("Moving to: " + nearestNeigh);
-            state.moveTo(nearestNeigh);
-            neighbourTiles.clear();
-        } else {
-            // retraceSteps();
-            System.out.println("Peek at visited tiles is..." + visitedTiles.peek());
-            // need some way of marking tile visited without it being the *last* visited
-            state.moveTo(visitedTiles.peek());
-        }
-    }
+      // find the neighbour with the lowest distance to the orb
+      if (!tempNeighbour.isEmpty()) {
+        tempNeighbour.sort(Comparator.comparing(node -> node.getDistanceToTarget()));
+        long nearestNeigh = tempNeighbour.get(0).getId();
+        System.out.println("Moving to: " + nearestNeigh);
+        state.moveTo(nearestNeigh);
+        neighbourTiles.clear();
+      } else {
+        // retraceSteps();
+        System.out.println("Peek at visited tiles is..." + visitedTiles.peek());
+        // need some way of marking tile visited without it being the *last* visited
+        state.moveTo(visitedTiles.peek());
       }
-
-    public List<NodeStatus> newNeighbours(Collection<NodeStatus> neighbours) {
-        List<NodeStatus> tempNeighbour = new ArrayList<>();
-
-        for (NodeStatus n : neighbours) {
-          if ((!visitedTiles.contains(n.getId()))) {
-            unvisitedTiles.add(n.getId());
-            tempNeighbour.add(n);
-            System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
-          }
-        }
-        return tempNeighbour;
     }
+  }
+
+  public List<NodeStatus> newNeighbours(Collection<NodeStatus> neighbours) {
+    List<NodeStatus> tempNeighbour = new ArrayList<>();
+
+    for (NodeStatus n : neighbours) {
+      if ((!visitedTiles.contains(n.getId()))) {
+        unvisitedTiles.add(n.getId());
+        tempNeighbour.add(n);
+        System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
+      }
+    }
+    return tempNeighbour;
+  }
 
 
 //    public void retraceSteps() {
