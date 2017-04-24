@@ -1,12 +1,13 @@
 package student;
 
 import game.*;
-import game.Tile;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Explorer {
-  private Stack<Long> visitedTiles = new Stack<>();
+  private Stack<CaveNode> currentRoute = new Stack<>();
+  private Map<Long, CaveNode> caveMap = new ConcurrentHashMap<>();
   private List<Long> unvisitedTiles = new ArrayList<>();
   private Collection<NodeStatus> neighbourTiles = new ArrayList<>();
 
@@ -43,58 +44,48 @@ public class Explorer {
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
 
+      // Create a new node for current tile
+      CaveNode currentNode = new CaveNodeImpl(state.getCurrentLocation());
 
-        // Add current location ID to visited tile stack
-      visitedTiles.add(state.getCurrentLocation());
+      // Add current node and env info to caveMap and visited tile stack
+      currentNode.setDistance(state.getDistanceToTarget());
+      currentRoute.add(currentNode);
+      caveMap.put(currentNode.getId(), currentNode);
+
+      // Get neighbours for current pos
       neighbourTiles = state.getNeighbours();
 
-      System.out.println("Size of neighbourTiles = " + neighbourTiles.size());
+      // Filter out any already visited tiles
       List<NodeStatus> tempNeighbour = newNeighbours(neighbourTiles);
-      // get list of unvisited neighbours and adds to tempNeighbour
-//        for (NodeStatus n : neighbourTiles) {
-//            if ((!visitedTiles.contains(n.getId()))) {
-//                unvisitedTiles.add(n.getId());
-//                tempNeighbour.add(n);
-//                System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
-//            }
-//  }
 
-      // find the neighbour with the lowest distance to the orb
+      // Find the neighbour with the lowest distance to the orb and go to it
       if (!tempNeighbour.isEmpty()) {
-        tempNeighbour.sort(Comparator.comparing(node -> node.getDistanceToTarget()));
-        long nearestNeigh = tempNeighbour.get(0).getId();
-        System.out.println("Moving to: " + nearestNeigh);
-        state.moveTo(nearestNeigh);
+        state.moveTo(nearestNeighbour(tempNeighbour));
         neighbourTiles.clear();
+      // If you're in a dead end, go back...
       } else {
-        // retraceSteps();
-        System.out.println("Peek at visited tiles is..." + visitedTiles.peek());
-        // need some way of marking tile visited without it being the *last* visited
-        state.moveTo(visitedTiles.peek());
+        currentRoute.pop();
+        state.moveTo(currentRoute.pop().getId());
       }
     }
   }
 
+  public long nearestNeighbour(List<NodeStatus> neighbours) {
+    neighbours.sort(Comparator.comparing(node -> node.getDistanceToTarget()));
+    return neighbours.get(0).getId();
+  }
+
   public List<NodeStatus> newNeighbours(Collection<NodeStatus> neighbours) {
     List<NodeStatus> tempNeighbour = new ArrayList<>();
-
+    // Return a list of unvisited neighbours
     for (NodeStatus n : neighbours) {
-      if ((!visitedTiles.contains(n.getId()))) {
-        unvisitedTiles.add(n.getId());
+      if ((!caveMap.containsKey(n.getId()))) {
         tempNeighbour.add(n);
-        System.out.println("Adding node ID " + n.getId() + " to unvisited tiles");
       }
     }
     return tempNeighbour;
   }
 
-
-//    public void retraceSteps() {
-//        Stack<Long> lastRoute = (Stack<Long>) visitedTiles.clone();
-//         for (long id : lastRoute) {
-//
-//         }
-//    }
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
    * gold as possible along the way. Your solution must ALWAYS escape before time runs

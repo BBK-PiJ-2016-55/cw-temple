@@ -8,6 +8,10 @@ public class CaveNodeImpl implements CaveNode {
   private boolean visited = true;
   private int distanceToOrb;
 
+  public CaveNodeImpl(long id) {
+      this.id = id;
+  }
+
   @Override
   public long getId() {
     return id;
