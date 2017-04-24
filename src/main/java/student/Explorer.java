@@ -1,8 +1,15 @@
 package student;
 
-import game.*;
+import game.EscapeState;
+import game.ExplorationState;
+import game.NodeStatus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Explorer {
@@ -61,7 +68,7 @@ public class Explorer {
   }
 
   private long nearestNeighbour(List<NodeStatus> neighbours) {
-    neighbours.sort(Comparator.comparing(node -> node.getDistanceToTarget()));
+    neighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
     return neighbours.get(0).getId();
   }
 
