@@ -1,7 +1,6 @@
 package student;
 
 import game.Node;
-import game.NodeStatus;
 import game.Tile;
 
 /**
@@ -10,7 +9,7 @@ import game.Tile;
 public class EscapeNode {
   private Node node;
   private Tile tile;
-  private Node parent;
+  private EscapeNode parent;
   private int stepsFromStart;
   private int stepsToEnd;
   private int fCost;
@@ -20,8 +19,10 @@ public class EscapeNode {
     this.tile = node.getTile();
   }
 
-  public void setParent(Node parent) {
+  public void setParent(EscapeNode parent) {
     this.parent = parent;
+    // Calculate the distance by adding weight of edge with parent node to parent's distance
+    this.stepsFromStart = (parent.getStepsFromStart() + node.getEdge(parent.getNode()).length);
   }
 
   public void setStepsFromStart(int steps) {
@@ -50,7 +51,11 @@ public class EscapeNode {
     return fCost;
   }
 
-  public Node getParent() {
+  public EscapeNode getParent() {
     return parent;
+  }
+
+  public Node getNode() {
+      return node;
   }
 }

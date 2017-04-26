@@ -6,12 +6,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Explorer {
+  // todo - do I even need CaveNodes? I sticking with current approach, simplify
   private Stack<CaveNode> currentRoute = new Stack<>();
   private Map<Long, CaveNode> caveMap = new ConcurrentHashMap<>();
   // Data structure to store unexplored neighbour nodes
-  private Map<Integer, CaveNode> openNodes = new ConcurrentHashMap<>();
+  private Map<Integer, EscapeNode> openNodes = new ConcurrentHashMap<>();
   // Data structure to store explored nodes
-  private Map<Integer, CaveNode> closedNodes = new ConcurrentHashMap<>();
+  private Map<Integer, EscapeNode> closedNodes = new ConcurrentHashMap<>();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
