@@ -116,8 +116,13 @@ public class Explorer {
 
     // Traverse route
     while (!bestRouteStack.isEmpty()) {
-      state.moveTo(bestRouteStack.pop().getNode());
+      EscapeNode currentStep = bestRouteStack.pop();
+      if (state.getCurrentNode().getTile().getGold() != 0) {
+        state.pickUpGold();
+      }
+      state.moveTo(currentStep.getNode());
     }
+    return;
   }
 
   private EscapeNode getRoute(EscapeState state) {
