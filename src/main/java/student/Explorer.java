@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Explorer {
-  // todo - do I even need CaveNodes? I sticking with current approach, simplify
+  // todo - do I even need CaveNodes? If sticking with current approach, simplify
   private Stack<CaveNode> currentRoute = new Stack<>();
   private Map<Long, CaveNode> caveMap = new ConcurrentHashMap<>();
   private LinkedList<EscapeNode> queue = new LinkedList<>();
@@ -102,11 +102,11 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
+    // Get exit node to enable construction of route from start tile
+    EscapeNode current = getRoute(state);
+
     // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
-
-    // Start on the exit node
-    EscapeNode current = getRoute(state);
 
     // Work backwards from exit, adding each parent to route stack
     while (current.getParent() != null) {
@@ -137,29 +137,25 @@ public class Explorer {
       // Pop the current node from head of queue
       EscapeNode current = queue.remove();
 
-      // Get its neighbour Nodes
+      // Get current's neighbour Nodes
       Set<Node> neighbours = current.getNode().getNeighbours();
-      Set<Node> newNeighbours = new HashSet<>();
-      System.out.println("line 156");
 
-      // Go through neighbours and filter out any unvisited ones
+      // Go through neighbours
       for (Node n : neighbours) {
+        // Filter out already visited
         if (!checked.contains(n)) {
-          newNeighbours.add(n);
-          System.out.println("line 160");
-        }
-      }
-
-      for (Node nn : newNeighbours) {
-        if (nn.equals(exit)) {
-          return new EscapeNode(nn,current);
-        } else {
-          EscapeNode en = new EscapeNode(nn, current);
-          queue.add(en);
-          checked.add(nn);
+          if (n.equals(exit)) {
+            return new EscapeNode(n,current);
+          } else {
+            // Add neighbours to queue
+            queue.add(new EscapeNode(n, current));
+            // Mark current node as checked
+            checked.add(n);
+          }
         }
       }
     }
+    // If nothing is found, return null
     return null;
   }
 }
