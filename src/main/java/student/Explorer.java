@@ -51,6 +51,8 @@ public class Explorer {
       currentRoute.add(currentNode);
       caveMap.put(currentNode.getId(), currentNode);
 
+
+
       // Find unvisited neighbours and go to the one closest to the orb
       List<NodeStatus> tempNeighbours = newNeighbours(state.getNeighbours());
       if (!tempNeighbours.isEmpty()) {
