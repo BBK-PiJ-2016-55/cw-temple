@@ -9,14 +9,24 @@ import game.Tile;
 public class EscapeNode {
   private Node node;
   private Tile tile;
+  private int row;
+  private int col;
   private EscapeNode parent;
   private int stepsFromStart;
   private int stepsToEnd;
   private int fCost;
 
-  public EscapeNode(Node node) {
+  public EscapeNode(Node node, EscapeNode parent) {
     this.node = node;
     this.tile = node.getTile();
+    this.row = tile.getRow();
+    this.col = tile.getColumn();
+    if (parent == null) {
+      stepsFromStart = 0;
+      this.parent = null;
+    } else {
+      setParent(parent);
+    }
   }
 
   public void setParent(EscapeNode parent) {

@@ -3,6 +3,9 @@ package student;
 import game.*;
 
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Explorer {
@@ -10,9 +13,11 @@ public class Explorer {
   private Stack<CaveNode> currentRoute = new Stack<>();
   private Map<Long, CaveNode> caveMap = new ConcurrentHashMap<>();
   // Data structure to store unexplored neighbour nodes
-  private Map<Integer, EscapeNode> openNodes = new ConcurrentHashMap<>();
+  private Map<Node, EscapeNode> openNodes = new ConcurrentHashMap<>();
   // Data structure to store explored nodes
-  private Map<Integer, EscapeNode> closedNodes = new ConcurrentHashMap<>();
+  private Map<Node, EscapeNode> closedNodes = new ConcurrentHashMap<>();
+  private LinkedList<EscapeNode> queue = new LinkedList<>();
+  private Set<Node> checked = new HashSet<>();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -104,6 +109,90 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
+    Node start = state.getCurrentNode();
+
+    // Get end node of best route
+    EscapeNode out = getRoute(state);
+
+    // Create stack to read route into
+    Stack<EscapeNode> bestRouteStack = new Stack<>();
+
+    boolean reachedStart = false;
+
+    // Start on the exit node
+    EscapeNode current = out;
+
+    if (out == null) {
+      System.out.println("No final node found");
+    } else {
+      while (!current.getNode().equals(start)) {
+        System.out.println("line 123");
+        bestRouteStack.push(current)
+        EscapeNode next = current.getParent();
+        System.out.println("Parent of current is: " + next.getNode().getId());
+        bestRouteStack.add(next);
+        if (current.getParent().getNode().equals(start)) {
+          reachedStart = true;
+        }
+      }
+    }
+
+    while (!bestRouteStack.isEmpty()) {
+      state.moveTo(bestRouteStack.pop().getNode());
+      System.out.println("line 133");
+
+    }
+    return;
+  }
+
+
+  public EscapeNode getRoute(EscapeState state) {
+    System.out.println("line 139");
+
+    // Get target node
+    Node exit = state.getExit();
+
+    // Wrap + store current node
+    EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
+
+    openNodes.put(state.getCurrentNode(), root);
+    queue.add(root);
+
+    EscapeNode lastTail = null;
+
+    boolean finished = false;
+
+    // Go through each Node until we find the exit
+    while (!finished) {
+
+      // Pop the current node from head of queue
+      EscapeNode current = queue.remove();
+
+      // Get its neighbour Nodes
+      Set<Node> neighbours = current.getNode().getNeighbours();
+      Set<Node> newNeighbours = new HashSet<>();
+      System.out.println("line 156");
+
+      // Go through neighbours and filter out any unvisited ones
+      for (Node n : neighbours) {
+        if (!checked.contains(n)) {
+          newNeighbours.add(n);
+          System.out.println("line 160");
+        }
+      }
+
+      for (Node nn : newNeighbours) {
+        if (nn.equals(exit)) {
+          lastTail = new EscapeNode(nn,current);
+          finished = true;
+        } else {
+          EscapeNode en = new EscapeNode(nn, current);
+          queue.add(en);
+          checked.add(nn);
+        }
+      }
+    }
+    return lastTail;
   }
 }
 
