@@ -109,33 +109,21 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
-    Node start = state.getCurrentNode();
-
     // Get end node of best route
     EscapeNode out = getRoute(state);
 
     // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
 
-    boolean reachedStart = false;
-
     // Start on the exit node
     EscapeNode current = out;
 
-    if (out == null) {
-      System.out.println("No final node found");
-    } else {
-      while (!current.getNode().equals(start)) {
-        System.out.println("line 123");
-        bestRouteStack.push(current)
-        EscapeNode next = current.getParent();
-        System.out.println("Parent of current is: " + next.getNode().getId());
-        bestRouteStack.add(next);
-        if (current.getParent().getNode().equals(start)) {
-          reachedStart = true;
-        }
-      }
+    while (current.getParent() != null) {
+      System.out.println("line 123");
+      bestRouteStack.push(current);
+      current = current.getParent();
     }
+
 
     while (!bestRouteStack.isEmpty()) {
       state.moveTo(bestRouteStack.pop().getNode());
