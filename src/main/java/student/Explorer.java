@@ -3,19 +3,12 @@ package student;
 import game.*;
 
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Explorer {
   // todo - do I even need CaveNodes? I sticking with current approach, simplify
   private Stack<CaveNode> currentRoute = new Stack<>();
   private Map<Long, CaveNode> caveMap = new ConcurrentHashMap<>();
-  // Data structure to store unexplored neighbour nodes
-  private Map<Node, EscapeNode> openNodes = new ConcurrentHashMap<>();
-  // Data structure to store explored nodes
-  private Map<Node, EscapeNode> closedNodes = new ConcurrentHashMap<>();
   private LinkedList<EscapeNode> queue = new LinkedList<>();
   private Set<Node> checked = new HashSet<>();
 
@@ -109,33 +102,25 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
-    // Get end node of best route
-    EscapeNode out = getRoute(state);
-
     // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
 
     // Start on the exit node
-    EscapeNode current = out;
+    EscapeNode current = getRoute(state);
 
+    // Work backwards from exit, adding each parent to route stack
     while (current.getParent() != null) {
-      System.out.println("line 123");
       bestRouteStack.push(current);
       current = current.getParent();
     }
 
-
+    // Traverse route
     while (!bestRouteStack.isEmpty()) {
       state.moveTo(bestRouteStack.pop().getNode());
-      System.out.println("line 133");
-
     }
-    return;
   }
 
-
-  public EscapeNode getRoute(EscapeState state) {
-    System.out.println("line 139");
+  private EscapeNode getRoute(EscapeState state) {
 
     // Get target node
     Node exit = state.getExit();
@@ -143,15 +128,11 @@ public class Explorer {
     // Wrap + store current node
     EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
 
-    openNodes.put(state.getCurrentNode(), root);
+    // Add start node to queue
     queue.add(root);
 
-    EscapeNode lastTail = null;
-
-    boolean finished = false;
-
     // Go through each Node until we find the exit
-    while (!finished) {
+    while (!queue.isEmpty()) {
 
       // Pop the current node from head of queue
       EscapeNode current = queue.remove();
@@ -171,8 +152,7 @@ public class Explorer {
 
       for (Node nn : newNeighbours) {
         if (nn.equals(exit)) {
-          lastTail = new EscapeNode(nn,current);
-          finished = true;
+          return new EscapeNode(nn,current);
         } else {
           EscapeNode en = new EscapeNode(nn, current);
           queue.add(en);
@@ -180,7 +160,7 @@ public class Explorer {
         }
       }
     }
-    return lastTail;
+    return null;
   }
 }
 
