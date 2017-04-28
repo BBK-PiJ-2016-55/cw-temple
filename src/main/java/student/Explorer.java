@@ -5,7 +5,6 @@ import game.*;
 import java.util.*;
 
 public class Explorer {
-  // todo - do I even need CaveNodes? If sticking with current approach, simplify
   private Stack<Long> currentRoute = new Stack<>();
   private Set<Long> visitedNodes = new HashSet<>();
   private LinkedList<EscapeNode> queue = new LinkedList<>();
@@ -42,15 +41,14 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-
     while (state.getDistanceToTarget() != 0) {
 
-      // Add current position to checked list, if new
+      // Add current position to visited list, if new.
       if (!visitedNodes.contains(state.getCurrentLocation())) {
         visitedNodes.add(state.getCurrentLocation());
       }
 
-      // Move to closest, unvisited neighbour
+      // Move to closest, unvisited neighbour.
       Long closestNeighbour = findNewNeighbours(state.getNeighbours());
       if (closestNeighbour != null) {
         state.moveTo(closestNeighbour);
@@ -58,27 +56,24 @@ public class Explorer {
         continue;
       }
 
-      // If there are no unvisited neighbours (i.e., dead end), move back one step
+      // If there are no unvisited neighbours (i.e., dead end), move back one step.
       currentRoute.pop();
       state.moveTo(currentRoute.peek());
     }
   }
 
   private Long findNewNeighbours(Collection<NodeStatus> neighbours) {
-
     List<NodeStatus> tempNeighbours = new ArrayList<>();
 
-    // Filter out any previously-visited neighbours
+    // Filter out any previously-visited neighbours.
     for (NodeStatus n : neighbours) {
       if (!visitedNodes.contains(n.getId())) {
         tempNeighbours.add(n);
       }
     }
 
-    // Sort according to distance from orb (ascending)
+    // Sort according to distance from orb, then return ID/null if in a dead end.
     tempNeighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
-
-    // Return ID of neighbour nearest orb, or null if no new neighbours
     return (tempNeighbours.isEmpty() ? null : tempNeighbours.get(0).getId());
   }
 
