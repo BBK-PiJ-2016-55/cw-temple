@@ -42,50 +42,44 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
+
     while (state.getDistanceToTarget() != 0) {
-      // todo - pare CaveNode back so just using NodeStatus?
-      // Add current position to checked list
-      visitedNodes.add(state.getCurrentLocation());
 
-      // Find any unvisited neighbours
-      Long closestNeighbour = findNewNeighbours(state.getNeighbours()); // Returns null if none found
-
-      if (closestNeighbour != null) {
-        // Sort and move to node nearest orb
-        tempNeighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
-        state.moveTo(tempNeighbours.get(0).getId());
-        currentRoute.push(state.getCurrentLocation());
-        System.out.println("Added node " + state.getCurrentLocation() + " to currentRoute");
-
-      // If you're at a dead end, go back...
-      // todo - any better way of dealing with this? e.g., reverse when moving away from orb for some time...
-      } else {
-        // Remove current tile from route
-        currentRoute.pop();
-
-        // Get id of last tile on route
-        state.moveTo(currentRoute.pop());
-        System.out.println("Next node to move back to is " + currentRoute.peek());
+      // Add current position to checked list, if new
+      if (!visitedNodes.contains(state.getCurrentLocation())) {
+        visitedNodes.add(state.getCurrentLocation());
       }
+
+      // Move to closest, unvisited neighbour
+      Long closestNeighbour = findNewNeighbours(state.getNeighbours());
+      if (closestNeighbour != null) {
+        state.moveTo(closestNeighbour);
+        currentRoute.push(state.getCurrentLocation());
+        continue;
+      }
+
+      // If there are no unvisited neighbours (i.e., dead end), move back one step
+      currentRoute.pop();
+      state.moveTo(currentRoute.peek());
     }
   }
 
-  private long moveBackwardsOneStep() {
-
-  }
-
   private Long findNewNeighbours(Collection<NodeStatus> neighbours) {
+
     List<NodeStatus> tempNeighbours = new ArrayList<>();
+
+    // Filter out any previously-visited neighbours
     for (NodeStatus n : neighbours) {
       if (!visitedNodes.contains(n.getId())) {
         tempNeighbours.add(n);
       }
     }
+
+    // Sort according to distance from orb (ascending)
     tempNeighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
-    if (tempNeighbours.isEmpty()) {
-      return null;
-    }
-    return tempNeighbours.get(0).getId();
+
+    // Return ID of neighbour nearest orb, or null if no new neighbours
+    return (tempNeighbours.isEmpty() ? null : tempNeighbours.get(0).getId());
   }
 
   /**
