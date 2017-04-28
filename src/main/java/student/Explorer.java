@@ -103,8 +103,11 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
+    // Generate EscapeNode for spawn point
+    EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
+
     // Get exit node to enable construction of route from start tile
-    EscapeNode current = getRoute(state);
+    EscapeNode current = getRoute(root, state.getExit().getId());
 
     // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
@@ -126,16 +129,10 @@ public class Explorer {
     return;
   }
 
-  private EscapeNode getRoute(EscapeState state) {
-
-    // Get target node
-    Node exit = state.getExit();
-
-    // Wrap + store current node
-    EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
+  private EscapeNode getRoute(EscapeNode start, Long dest) {
 
     // Add start node to queue
-    queue.add(root);
+    queue.add(start);
 
     // Go through each Node until we find the exit
     while (!queue.isEmpty()) {
@@ -150,7 +147,7 @@ public class Explorer {
       for (Node n : neighbours) {
         // Filter out already visited
         if (!checked.contains(n)) {
-          if (n.equals(exit)) {
+          if (n.getId() == dest) {
             return new EscapeNode(n,current);
           } else {
             // Add neighbours to queue
