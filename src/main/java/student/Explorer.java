@@ -137,13 +137,17 @@ public class Explorer {
     // Go through each Node until we find the exit
     while (!queue.isEmpty()) {
 
-      queue.sort(Comparator.comparing(EscapeNode::getStepsFromStart));
+      queue.sort(Comparator.comparing(EscapeNode::getCost));
 
       // Pop the lowest-weighted node from queue
       EscapeNode current = queue.remove(0);
 
+      checked.add(current.getNode());
+
       // Get current's neighbour Nodes
       Set<Node> neighbours = current.getNode().getNeighbours();
+
+
 
       // Go through neighbours
       for (Node n : neighbours) {
@@ -152,16 +156,34 @@ public class Explorer {
           if (n.getId() == dest) {
             return new EscapeNode(n,current);
           } else {
-            // Add neighbours to queue
-            queue.add(new EscapeNode(n, current));
-            // Mark current node as checked
-            checked.add(n);
+            for (EscapeNode en : queue) {
+              if (en.getNode().equals(n)) {
+                /// call a function to change en's parentage and cost if appropriate
+                checkCost(en, current);
+                // do some kind of break/continue function so we don't add it a second time
+
+              }
+            }
           }
+          // Add neighbours to queue
+          queue.add(new EscapeNode(n, current));
         }
       }
     }
     // If nothing is found, return null
     return null;
+  }
+
+  private void checkCost(EscapeNode child, EscapeNode current) {
+
+    // Get edge connecting current to neighbour being re-analysed
+    Edge edge = current.getNode().getEdge(child.getNode());
+
+    // Check if current distance + calculate distance is greater than child's distance
+    if (child.getCost() > (current.getCost() + edge.length())) {
+      child.setCost(current.getCost() + edge.length());
+      child.setParent(current);
+    }
   }
 
 }
