@@ -3,12 +3,11 @@ package student;
 import game.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Explorer {
   // todo - do I even need CaveNodes? If sticking with current approach, simplify
-  private Stack<CaveNode> currentRoute = new Stack<>();
-  private Map<Long, CaveNode> caveMap = new ConcurrentHashMap<>();
+  private Stack<Long> currentRoute = new Stack<>();
+  private Set<Long> visitedNodes = new HashSet<>();
   private LinkedList<EscapeNode> queue = new LinkedList<>();
   private Set<Node> checked = new HashSet<>();
 
@@ -44,38 +43,49 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
-      // todo - get rid of the distance field in caveMap unless used later
-      // Create new node with useful env info of current position
-      CaveNode currentNode = new CaveNodeImpl(state.getCurrentLocation(),
-              state.getDistanceToTarget());
-      currentRoute.add(currentNode);
-      caveMap.put(currentNode.getId(), currentNode);
+      // todo - pare CaveNode back so just using NodeStatus?
+      // Add current position to checked list
+      visitedNodes.add(state.getCurrentLocation());
 
+      // Find any unvisited neighbours
+      Long closestNeighbour = findNewNeighbours(state.getNeighbours()); // Returns null if none found
 
-
-      // Find unvisited neighbours and go to the one closest to the orb
-      List<NodeStatus> tempNeighbours = newNeighbours(state.getNeighbours());
-      if (!tempNeighbours.isEmpty()) {
+      if (closestNeighbour != null) {
+        // Sort and move to node nearest orb
         tempNeighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
         state.moveTo(tempNeighbours.get(0).getId());
+        currentRoute.push(state.getCurrentLocation());
+        System.out.println("Added node " + state.getCurrentLocation() + " to currentRoute");
 
       // If you're at a dead end, go back...
       // todo - any better way of dealing with this? e.g., reverse when moving away from orb for some time...
       } else {
+        // Remove current tile from route
         currentRoute.pop();
-        state.moveTo(currentRoute.pop().getId());
+
+        // Get id of last tile on route
+        state.moveTo(currentRoute.pop());
+        System.out.println("Next node to move back to is " + currentRoute.peek());
       }
     }
   }
 
-  private List<NodeStatus> newNeighbours(Collection<NodeStatus> neighbours) {
+  private long moveBackwardsOneStep() {
+
+  }
+
+  private Long findNewNeighbours(Collection<NodeStatus> neighbours) {
     List<NodeStatus> tempNeighbours = new ArrayList<>();
     for (NodeStatus n : neighbours) {
-      if ((!caveMap.containsKey(n.getId()))) {
+      if (!visitedNodes.contains(n.getId())) {
         tempNeighbours.add(n);
       }
     }
-    return tempNeighbours;
+    tempNeighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
+    if (tempNeighbours.isEmpty()) {
+      return null;
+    }
+    return tempNeighbours.get(0).getId();
   }
 
   /**
