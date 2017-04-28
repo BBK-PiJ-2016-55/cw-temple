@@ -133,9 +133,11 @@ public class Explorer {
 
     // Add start node to queue
     queue.add(start);
+    visitedNodes.clear();
+    visitedNodes.add(start.getNode().getId());
 
     // Go through each Node until we find the exit
-    while (!queue.isEmpty()) {
+    while (true) {
 
       queue.sort(Comparator.comparing(EscapeNode::getCost));
 
@@ -150,26 +152,27 @@ public class Explorer {
       // todo - this is fucking horrible, try and make it less fucking horrible
       // Go through neighbours
       for (Node n : neighbours) {
-        // Filter out already visited
-        if (!checked.contains(n)) {
-          if (n.getId() == dest) {
-            return new EscapeNode(n,current);
-          } else {
-            for (EscapeNode en : queue) {
-              if (en.getNode().equals(n)) {
-                /// call a function to change en's parentage and cost if appropriate
-                checkCost(en, current);
-                // do some kind of break/continue function so we don't add it a second time
-
-              }
-            }
-          }
+        if (n.getId() == dest) {
+          return new EscapeNode(n, current);
+        } else if (checked.contains(n)) {
+          continue;
+        } else if (visitedNodes.contains(n.getId())) {
+          checkCost(retrieveFromQueue(n), current);
+        } else {
           // Add neighbours to queue
           queue.add(new EscapeNode(n, current));
+          visitedNodes.add(n.getId());
         }
       }
     }
-    // If nothing is found, return null
+  }
+
+  private EscapeNode retrieveFromQueue(Node n) {
+    for (EscapeNode en : queue) {
+      if (en.getNode().equals(n)) {
+        return en;
+      }
+    }
     return null;
   }
 
@@ -185,6 +188,5 @@ public class Explorer {
       child.setParent(current);
     }
   }
-
 }
 
