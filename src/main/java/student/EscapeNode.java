@@ -11,38 +11,36 @@ public class EscapeNode {
   private int cost;
 
 
-  public EscapeNode(Node node, EscapeNode parent) {
+  EscapeNode(Node node, EscapeNode parent) {
     this.node = node;
     setParent(parent);
   }
 
-  public void setParent(EscapeNode parent) {
+  void setParent(EscapeNode parent) {
 
     if (parent == null) {
       cost = 0;
-      this.parent = null;
     } else {
       this.parent = parent;
       // Calculate the distance by adding weight of edge with parent node to parent's distance
-      this.cost = (parent.getCost() + node.getEdge(parent.getNode()).length());
+      setCost(parent.getCost() + node.getEdge(parent.getNode()).length());
     }
   }
 
-  public void setCost(int steps) {
+  void setCost(int steps) {
     cost = steps;
   }
 
-  public int getCost() {
+  int getCost() {
     return cost;
   }
 
-
-  public EscapeNode getParent() {
+  EscapeNode getParent() {
     return parent;
   }
 
   public Node getNode() {
-      return node;
+    return node;
   }
 
 }
