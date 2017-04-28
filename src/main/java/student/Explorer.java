@@ -7,7 +7,7 @@ import java.util.*;
 public class Explorer {
   private Stack<Long> currentRoute = new Stack<>();
   private Set<Long> visitedNodes = new HashSet<>();
-  private LinkedList<EscapeNode> queue = new LinkedList<>();
+  private List<EscapeNode> queue = new ArrayList<>();
   private Set<Node> checked = new HashSet<>();
 
   /**
@@ -137,8 +137,10 @@ public class Explorer {
     // Go through each Node until we find the exit
     while (!queue.isEmpty()) {
 
-      // Pop the current node from head of queue
-      EscapeNode current = queue.remove();
+      queue.sort(Comparator.comparing(EscapeNode::getStepsFromStart));
+
+      // Pop the lowest-weighted node from queue
+      EscapeNode current = queue.remove(0);
 
       // Get current's neighbour Nodes
       Set<Node> neighbours = current.getNode().getNeighbours();
@@ -161,5 +163,6 @@ public class Explorer {
     // If nothing is found, return null
     return null;
   }
+
 }
 
