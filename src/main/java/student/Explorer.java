@@ -147,8 +147,7 @@ public class Explorer {
       // Get current's neighbour Nodes
       Set<Node> neighbours = current.getNode().getNeighbours();
 
-
-
+      // todo - this is fucking horrible, try and make it less fucking horrible
       // Go through neighbours
       for (Node n : neighbours) {
         // Filter out already visited
@@ -174,6 +173,7 @@ public class Explorer {
     return null;
   }
 
+  // todo - will there ever be a downstream impact? ie., will child node ever be a parent
   private void checkCost(EscapeNode child, EscapeNode current) {
 
     // Get edge connecting current to neighbour being re-analysed
