@@ -5,7 +5,7 @@ import game.Node;
 /**
  * Created by svince04 on 26/04/2017 for cw-temple.
  */
-public class EscapeNode implements Comparable<EscapeNode> {
+public class EscapeNode {
   private Node node;
   private EscapeNode parent;
   private int cost;
@@ -51,15 +51,4 @@ public class EscapeNode implements Comparable<EscapeNode> {
   public Node getNode() {
     return node;
   }
-
-  // Implements custom sort to use gold value to break tie in cost value
-  @Override
-  public int compareTo(EscapeNode other) {
-    int result = Integer.compare(this.cost, other.cost);
-    if (result == 0) {
-      result = ((Integer.compare(this.gold, other.gold) > 0) ? this.gold : other.gold);
-    }
-    return result;
-  }
-
 }

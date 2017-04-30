@@ -106,7 +106,7 @@ public class Explorer {
     // Generate EscapeNode for spawn point
     EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
 
-    // todo - id most gold before here and pass that in
+    // todo - id most gold before here and pass that in as destination?
     // Get exit node with tail back to start tile
     EscapeNode current = getRoute(root, state.getExit().getId());
 
@@ -136,13 +136,21 @@ public class Explorer {
     // Add start node to queue
     queue.add(start);
 
+    // Custom comparator to compare on cost and gold
+    Comparator<EscapeNode> comp = (en1, en2) -> {
+      int result = Integer.compare(en1.getCost(), en2.getCost());
+      if (result == 0) {
+        result = ((Integer.compare(en1.getGold(), en2.getGold()) > 0) ? en1.getGold() : en2.getGold());
+      }
+      return result;
+    };
+
     // Go through each Node until we find the exit
     while (true) {
 
-      // Sorts by cost (asc) and gold (desc)
-      Collections.sort(queue);
+      // Sort based on edge weight (asc) and gold (desc)
+      queue.sort(comp);
 
-      // todo - if there's a tie in cost, go for the one with the most gold?
       // Pop the lowest-weighted node from queue
       EscapeNode current = queue.remove(0);
 
