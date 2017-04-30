@@ -106,7 +106,8 @@ public class Explorer {
     // Generate EscapeNode for spawn point
     EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
 
-    // Get exit node to enable construction of route from start tile
+    // todo - id most gold before here and pass that in
+    // Get exit node with tail back to start tile
     EscapeNode current = getRoute(root, state.getExit().getId());
 
     // Create stack to read route into
@@ -129,18 +130,19 @@ public class Explorer {
     return;
   }
 
+
   private EscapeNode getRoute(EscapeNode start, Long dest) {
 
     // Add start node to queue
     queue.add(start);
-    visitedNodes.clear();
-    visitedNodes.add(start.getNode().getId());
 
     // Go through each Node until we find the exit
     while (true) {
 
-      queue.sort(Comparator.comparing(EscapeNode::getCost));
+      // Sorts by cost (asc) and gold (desc)
+      Collections.sort(queue);
 
+      // todo - if there's a tie in cost, go for the one with the most gold?
       // Pop the lowest-weighted node from queue
       EscapeNode current = queue.remove(0);
 
@@ -150,16 +152,18 @@ public class Explorer {
       Set<Node> neighbours = current.getNode().getNeighbours();
 
       // todo - this is fucking horrible, try and make it less fucking horrible
-      // Go through neighbours
       for (Node n : neighbours) {
+        // Return if we find the destination we're looking for
         if (n.getId() == dest) {
           return new EscapeNode(n, current);
+          // Todo: what does checked do again? I can't remember but taking out breaks Sid!
         } else if (checked.contains(n)) {
           continue;
-        } else if (visitedNodes.contains(n.getId())) {
+          // If we've already see this neighbour, recalculate cost and change parent if needed
+        } else if (queue.contains(n.getId())) {
           checkCost(retrieveFromQueue(n), current);
         } else {
-          // Add neighbours to queue
+          // Add totally new neighbours to queue
           queue.add(new EscapeNode(n, current));
           visitedNodes.add(n.getId());
         }
