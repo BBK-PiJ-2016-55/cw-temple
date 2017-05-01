@@ -110,6 +110,12 @@ public class Explorer {
     // Get exit node with tail back to start tile
     EscapeNode current = getRoute(root, state.getExit().getId());
 
+    // Traverse route
+    traverseRoute(state, current);
+
+  }
+
+  private void traverseRoute(EscapeState state, EscapeNode current) {
     // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
 
@@ -127,7 +133,6 @@ public class Explorer {
       }
       state.moveTo(currentStep.getNode());
     }
-    return;
   }
 
 
