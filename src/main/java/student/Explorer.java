@@ -106,23 +106,61 @@ public class Explorer {
     // Generate EscapeNode for spawn point
     EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
 
-    // todo - id most gold before here and pass that in as destination?
-    // Get exit node with tail back to start tile
-    EscapeNode current = getRoute(root, state.getExit().getId());
+    // Find the richest node within reach
+    EscapeNode current = findGold(state, root);
 
     // Traverse route
     traverseRoute(state, current);
 
   }
 
-  private void traverseRoute(EscapeState state, EscapeNode current) {
+  private EscapeNode findGold(EscapeState state, EscapeNode current) {
+    Collection<Node> allNodes = state.getVertices();
+
+    // Find all the nodes with gold
+    List<Node> richNodes = new ArrayList<>();
+    for (Node n : allNodes) {
+      if (n.getTile().getGold() != 0) {
+        richNodes.add(n);
+      }
+    }
+
+    // Sort according to richness (which way does this default? asc or desc?)
+    richNodes.sort(Comparator.comparing(node -> node.getTile().getGold()));
+    EscapeNode destinationNode = null;
+    boolean finished = false;
+    int i = 0;
+
+    while (!finished) {
+      // Get best route to gold
+      destinationNode = getRoute(current, richNodes.get(i).getId());
+
+      // Get route from gold to exit
+      EscapeNode exitNode = getRoute(destinationNode, state.getExit().getId());
+
+      // Get current time remaining
+      int timeLeft = state.getTimeRemaining();
+
+      // Check if we've got time to get to exit
+      if (timeLeft >= (destinationNode.getCost() + exitNode.getCost()) ) {
+        traverseRoute(state, destinationNode);
+        finished = true;
+      } else {
+        i++;
+      }
+    }
+    return destinationNode;
+}
+
+
+  private void traverseRoute(EscapeState state, EscapeNode goal) {
     // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
 
     // Work backwards from exit, adding each parent to route stack
-    while (current.getParent() != null) {
-      bestRouteStack.push(current);
-      current = current.getParent();
+    while (goal.getParent() != null) {
+      bestRouteStack.push(goal);
+      goal = goal.getParent();
     }
 
     // Traverse route
@@ -131,6 +169,7 @@ public class Explorer {
       if (state.getCurrentNode().getTile().getGold() != 0) {
         state.pickUpGold();
       }
+      System.out.println("Moving to node: " + currentStep.getNode().getId());
       state.moveTo(currentStep.getNode());
     }
   }
