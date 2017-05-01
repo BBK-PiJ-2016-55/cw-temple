@@ -105,50 +105,34 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
-//    // Generate EscapeNode for spawn point
-//    EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
-//
-//    // todo - id most gold before here and pass that in as destination?
-//    // Get exit node with tail back to start tile
-//    EscapeNode current = getRoute(root, state.getExit().getId());
-//
-//    traverseRoute(state, current);
-
-    // Create graph of escape nodes, which should inc shortest route to each
+    // Create escapeGraph using current location
     createEscapeGraph(state);
 
-    // Create a list of the richest nodes at this point
+    // Create list of the richest nodes
     createGoldQueue(state);
 
-    // While there's still something in the queue, see if you can get to the closest rich node
+    // While there's still something in goldQueue, see if you can get to the closest rich node
     while (!goldQueue.isEmpty()) {
-
-      // Refresh escapeGraph using current position
-      createEscapeGraph(state);
 
       // retrieve the goldiest EscapeNode from the graph
       EscapeNode rich = allNodesMap.get(goldQueue.get(0));
 
-      // Get your current node from the Graph. We should already know exitNode
-      EscapeNode current = allNodesMap.get(state.getCurrentNode());
+      // Calculate how many steps to gold + exit
+      int costOfRoute = rich.getCost() + (getRoute(rich, state.getExit().getId()).getCost()) ;
 
-      int costOfRoute = rich.getCost();
-      int costToExit = getRoute(rich, state.getExit().getId()).getCost();
-      int totalCost = costOfRoute + costToExit;
-
-
-      // Check the richest node is reachable
-      if (totalCost > state.getTimeRemaining()) {
-        // If not, remove it from the list and go round the while loop again
+      // Check the richest node + exit are reachable
+      if (costOfRoute > state.getTimeRemaining()) {
+        // If not, remove richest node from the list and go round the while loop again
         goldQueue.remove(0);
       } else {
         // If it is, visit node, create a new gold queue and then go round the loop again
         traverseRoute(state, rich);
+        // Refresh escape graph using new location
+        createEscapeGraph(state);
+        // Refresh gold queue
         createGoldQueue(state);
       }
     }
-
-
     createEscapeGraph(state);
     traverseRoute(state, exitNode);
 
