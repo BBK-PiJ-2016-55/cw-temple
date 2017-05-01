@@ -7,7 +7,6 @@ import java.util.*;
 public class Explorer {
   private Stack<Long> currentRoute = new Stack<>();
   private Set<Long> visitedNodes = new HashSet<>();
-  private List<EscapeNode> queue = new ArrayList<>();
 
   private List<Node> goldQueue = new ArrayList<>();
   private EscapeNode exitNode;
@@ -215,14 +214,9 @@ public class Explorer {
   }
 
 
-
-
-
-
-
   private EscapeNode getRoute(EscapeNode start, Long dest) {
-
     Set<Node> checked = new HashSet<>();
+    List<EscapeNode> queue = new ArrayList<>();
 
     // Add start node to queue
     queue.add(start);
@@ -255,30 +249,19 @@ public class Explorer {
         // Return if we find the destination we're looking for
         if (n.getId() == dest) {
           queue.clear();
-          visitedNodes.clear();
           return new EscapeNode(n, current);
           // Todo: what does checked do again? I can't remember but taking out breaks Sid!
         } else if (checked.contains(n)) {
           continue;
           // If we've already see this neighbour, recalculate cost and change parent if needed
         } else if (queue.contains(n.getId())) {
-          checkCost(retrieveFromQueue(n), current);
+          checkCost(allNodesMap.get(n), current);
         } else {
           // Add totally new neighbours to queue
           queue.add(new EscapeNode(n, current));
-          visitedNodes.add(n.getId());
         }
       }
     }
-  }
-
-  private EscapeNode retrieveFromQueue(Node n) {
-    for (EscapeNode en : queue) {
-      if (en.getNode().equals(n)) {
-        return en;
-      }
-    }
-    return null;
   }
 
   // todo - will there ever be a downstream impact? ie., will child node ever be a parent
