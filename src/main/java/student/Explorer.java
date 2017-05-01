@@ -8,7 +8,10 @@ public class Explorer {
   private Stack<Long> currentRoute = new Stack<>();
   private Set<Long> visitedNodes = new HashSet<>();
   private List<EscapeNode> queue = new ArrayList<>();
-  private Set<Node> checked = new HashSet<>();
+
+  private List<Node> goldQueue = new ArrayList<>();
+  private EscapeNode exitNode;
+  private Map<Node, EscapeNode> allNodesMap = new HashMap<>();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -103,64 +106,80 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
-    // Generate EscapeNode for spawn point
-    EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
+//    // Generate EscapeNode for spawn point
+//    EscapeNode root = new EscapeNode(state.getCurrentNode(), null);
+//
+//    // todo - id most gold before here and pass that in as destination?
+//    // Get exit node with tail back to start tile
+//    EscapeNode current = getRoute(root, state.getExit().getId());
+//
+//    traverseRoute(state, current);
 
-    // Find the richest node within reach
-    EscapeNode current = findGold(state, root);
+    // Create graph of escape nodes, which should inc shortest route to each
+    createEscapeGraph(state);
 
-    // Traverse route
-    traverseRoute(state, current);
+    // Create a list of the richest nodes at this point
+    createGoldQueue(state);
+
+    // While there's still something in the queue, see if you can get to the closest rich node
+    while (!goldQueue.isEmpty()) {
+
+      // Refresh escapeGraph using current position
+      createEscapeGraph(state);
+
+      // retrieve the goldiest EscapeNode from the graph
+      EscapeNode rich = allNodesMap.get(goldQueue.get(0));
+
+      // Get your current node from the Graph. We should already know exitNode
+      EscapeNode current = allNodesMap.get(state.getCurrentNode());
+
+      int costOfRoute = rich.getCost();
+      int costToExit = getRoute(rich, state.getExit().getId()).getCost();
+      int totalCost = costOfRoute + costToExit;
+
+
+      // Check the richest node is reachable
+      if (totalCost > state.getTimeRemaining()) {
+        // If not, remove it from the list and go round the while loop again
+        goldQueue.remove(0);
+      } else {
+        // If it is, visit node, create a new gold queue and then go round the loop again
+        traverseRoute(state, rich);
+        createGoldQueue(state);
+      }
+    }
+
+
+    createEscapeGraph(state);
+    traverseRoute(state, exitNode);
 
   }
 
-  private EscapeNode findGold(EscapeState state, EscapeNode current) {
-    Collection<Node> allNodes = state.getVertices();
+  private void createGoldQueue(EscapeState state) {
 
-    // Find all the nodes with gold
-    List<Node> richNodes = new ArrayList<>();
+    goldQueue.clear();
+
+    Collection<Node> allNodes = state.getVertices();
     for (Node n : allNodes) {
       if (n.getTile().getGold() != 0) {
-        richNodes.add(n);
+        goldQueue.add(n);
       }
     }
 
-    // Sort according to richness (which way does this default? asc or desc?)
-    richNodes.sort(Comparator.comparing(node -> node.getTile().getGold()));
-    EscapeNode destinationNode = null;
-    boolean finished = false;
-    int i = 0;
-
-    while (!finished) {
-      // Get best route to gold
-      destinationNode = getRoute(current, richNodes.get(i).getId());
-
-      // Get route from gold to exit
-      EscapeNode exitNode = getRoute(destinationNode, state.getExit().getId());
-
-      // Get current time remaining
-      int timeLeft = state.getTimeRemaining();
-
-      // Check if we've got time to get to exit
-      if (timeLeft >= (destinationNode.getCost() + exitNode.getCost()) ) {
-        traverseRoute(state, destinationNode);
-        finished = true;
-      } else {
-        i++;
-      }
-    }
-    return destinationNode;
-}
+    // Sorts according to gold content (ascending, hopefully...)
+    Comparator<Node> goldNodeComparator = Comparator.comparing(node -> node.getTile().getGold());
+    Collections.sort(goldQueue, goldNodeComparator.reversed());
+  }
 
 
-  private void traverseRoute(EscapeState state, EscapeNode goal) {
+  private void traverseRoute(EscapeState state, EscapeNode current) {
     // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
 
     // Work backwards from exit, adding each parent to route stack
-    while (goal.getParent() != null) {
-      bestRouteStack.push(goal);
-      goal = goal.getParent();
+    while (current.getParent() != null) {
+      bestRouteStack.push(current);
+      current = current.getParent();
     }
 
     // Traverse route
@@ -169,13 +188,41 @@ public class Explorer {
       if (state.getCurrentNode().getTile().getGold() != 0) {
         state.pickUpGold();
       }
-      System.out.println("Moving to node: " + currentStep.getNode().getId());
       state.moveTo(currentStep.getNode());
     }
   }
 
+  // Converts each node into an EscapeNode object, so we know the quickest route to each one
+  private void createEscapeGraph(EscapeState state) {
+
+    // Clear allNodesMap
+    allNodesMap.clear();
+
+    // Create node for current position
+    EscapeNode current = new EscapeNode(state.getCurrentNode(), null);
+
+    // Get all Nodes
+    Collection<Node> allNodes = state.getVertices();
+
+    // Find best route for each node from current position
+    for (Node n : allNodes) {
+      EscapeNode temp = getRoute(current, n.getId());
+      allNodesMap.put(n, temp);
+    }
+
+    // Update exit node variable
+    exitNode = allNodesMap.get(state.getExit());
+  }
+
+
+
+
+
+
 
   private EscapeNode getRoute(EscapeNode start, Long dest) {
+
+    Set<Node> checked = new HashSet<>();
 
     // Add start node to queue
     queue.add(start);
@@ -207,6 +254,8 @@ public class Explorer {
       for (Node n : neighbours) {
         // Return if we find the destination we're looking for
         if (n.getId() == dest) {
+          queue.clear();
+          visitedNodes.clear();
           return new EscapeNode(n, current);
           // Todo: what does checked do again? I can't remember but taking out breaks Sid!
         } else if (checked.contains(n)) {
