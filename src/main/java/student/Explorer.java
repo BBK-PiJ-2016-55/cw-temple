@@ -105,6 +105,12 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
+    // If Sid spawns on a gold tile, pick it up before doing anything else
+    if (state.getCurrentNode().getTile().getGold() != 0) {
+      state.pickUpGold();
+      goldQueue.remove(state.getCurrentNode());
+    }
+
     // Create escapeGraph using current location
     createEscapeGraph(state);
 
@@ -114,7 +120,7 @@ public class Explorer {
     // While there's still something in goldQueue, see if you can get to the closest rich node
     while (!goldQueue.isEmpty()) {
 
-      // retrieve the goldiest EscapeNode from the graph
+      // retrieve the richest EscapeNode from the graph
       EscapeNode rich = allNodesMap.get(goldQueue.get(0));
 
       // Calculate how many steps to gold + exit
@@ -167,11 +173,13 @@ public class Explorer {
 
     // Traverse route
     while (!bestRouteStack.isEmpty()) {
+
       EscapeNode currentStep = bestRouteStack.pop();
+      state.moveTo(currentStep.getNode());
+
       if (state.getCurrentNode().getTile().getGold() != 0) {
         state.pickUpGold();
       }
-      state.moveTo(currentStep.getNode());
     }
   }
 
@@ -201,6 +209,7 @@ public class Explorer {
   private EscapeNode getRoute(EscapeNode start, Long dest) {
     Set<Node> checked = new HashSet<>();
     List<EscapeNode> queue = new ArrayList<>();
+
 
     // Add start node to queue
     queue.add(start);
@@ -238,7 +247,7 @@ public class Explorer {
         } else if (checked.contains(n)) {
           continue;
           // If we've already see this neighbour, recalculate cost and change parent if needed
-        } else if (queue.contains(n.getId())) {
+        } else if (queue.contains(allNodesMap.get(n))) {
           checkCost(allNodesMap.get(n), current);
         } else {
           // Add totally new neighbours to queue
@@ -251,6 +260,7 @@ public class Explorer {
   // todo - will there ever be a downstream impact? ie., will child node ever be a parent
   private void checkCost(EscapeNode child, EscapeNode current) {
 
+    System.out.println("CheckCost() is working...");
     // Get edge connecting current to neighbour being re-analysed
     Edge edge = current.getNode().getEdge(child.getNode());
 
