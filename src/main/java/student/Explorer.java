@@ -7,7 +7,7 @@ import java.util.*;
 public class Explorer {
   private Stack<Long> currentRoute = new Stack<>();
   private Set<Long> visitedNodes = new HashSet<>();
-
+  private EscapeNode start;
   private List<Node> goldQueue = new ArrayList<>();
   private EscapeNode exitNode;
   private Map<Node, EscapeNode> allNodesMap = new HashMap<>();
@@ -105,17 +105,17 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
-    // If Sid spawns on a gold tile, pick it up before doing anything else
-    if (state.getCurrentNode().getTile().getGold() != 0) {
-      state.pickUpGold();
-      goldQueue.remove(state.getCurrentNode());
-    }
+    // Create list of the richest nodes
+    createGoldQueue(state);
+
+//    // If Sid spawns on a gold tile, pick it up before doing anything else
+//    if (start.getNode().getTile().getGold() != 0) {
+//      state.pickUpGold();
+//      goldQueue.remove(start.getNode());
+//    }
 
     // Create escapeGraph using current location
     createEscapeGraph(state);
-
-    // Create list of the richest nodes
-    createGoldQueue(state);
 
     // While there's still something in goldQueue, see if you can get to the closest rich node
     while (!goldQueue.isEmpty()) {
@@ -145,6 +145,11 @@ public class Explorer {
   }
 
   private void createGoldQueue(EscapeState state) {
+
+    // If Sid spawns on a gold tile, pick it up before doing anything else
+    if (state.getCurrentNode().getTile().getGold() != 0) {
+      state.pickUpGold();
+    }
 
     goldQueue.clear();
 
@@ -186,18 +191,21 @@ public class Explorer {
   // Converts each node into an EscapeNode object, so we know the quickest route to each one
   private void createEscapeGraph(EscapeState state) {
 
+    // Gives us most nodes of interest
+    createGoldQueue(state);
+
     // Clear allNodesMap
     allNodesMap.clear();
 
     // Create node for current position
-    EscapeNode current = new EscapeNode(state.getCurrentNode(), null);
+    start = new EscapeNode(state.getCurrentNode(), null);
 
     // Get all Nodes
     Collection<Node> allNodes = state.getVertices();
 
     // Find best route for each node from current position
     for (Node n : allNodes) {
-      EscapeNode temp = getRoute(current, n.getId());
+      EscapeNode temp = getRoute(start, n.getId());
       allNodesMap.put(n, temp);
     }
 
