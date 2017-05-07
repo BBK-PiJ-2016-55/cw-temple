@@ -7,10 +7,7 @@ import java.util.*;
 public class Explorer {
   private Stack<Long> currentRoute = new Stack<>();
   private Set<Long> visitedNodes = new HashSet<>();
-  private EscapeNode start;
   private List<Node> goldQueue = new ArrayList<>();
-  private EscapeNode exitNode;
-  private Map<Node, EscapeNode> allNodesMap = new HashMap<>();
   private List<EscapeNode> openList = new ArrayList<>();
   private Map<Node, EscapeNode> closedList = new HashMap<>();
 
@@ -107,8 +104,6 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
 
-    //printMap(state);
-
     // Create list of the richest nodes
     createGoldQueue(state);
 
@@ -120,11 +115,11 @@ public class Explorer {
       current = new EscapeNode(state.getCurrentNode(), null);
 
       // retrieve the richest EscapeNode from the graph + plot route
-      EscapeNode rich = getRoute(current, goldQueue.get(0).getId());
+      EscapeNode rich = getRoute(current, goldQueue.get(0));
 
       EscapeNode tempRich = new EscapeNode(goldQueue.get(0), null);
       // Calculate how many steps to gold + exit
-      EscapeNode tempExitRoute = getRoute(tempRich, state.getExit().getId());
+      EscapeNode tempExitRoute = getRoute(tempRich, state.getExit());
 
 
       int costOfRoute = rich.getCost() + tempExitRoute.getCost();
@@ -144,7 +139,7 @@ public class Explorer {
     }
 
     // Once we run out of reachable gold nodes, head for the exit
-    traverseRoute(state, getRoute(current, state.getExit().getId()));
+    traverseRoute(state, getRoute(current, state.getExit()));
 
   }
 
@@ -195,7 +190,7 @@ public class Explorer {
 
 
 
-  private EscapeNode getRoute(EscapeNode start, Long dest) {
+  private EscapeNode getRoute(EscapeNode start, Node dest) {
 
     // Clear lists
     closedList.clear();
@@ -206,7 +201,7 @@ public class Explorer {
     openList.add(start);
 
     // Go through each Node until we find the destination
-    while (current.getNode().getId() != dest) {
+    while (current.getNode() != dest) {
 
       // Get most promising EscapeNode
       openList.sort(Comparator.comparing(EscapeNode::getCost));
@@ -255,6 +250,7 @@ public class Explorer {
   // Checks and updates node cost if quicker than already found
   private boolean checkCost(EscapeNode child, EscapeNode current) {
     boolean quicker = false;
+
     // Get edge connecting current to neighbour being re-analysed
     Edge edge = current.getNode().getEdge(child.getNode());
 
@@ -263,6 +259,7 @@ public class Explorer {
       child.setParent(current);
       quicker = true;
     }
+
     return quicker;
   }
 }
