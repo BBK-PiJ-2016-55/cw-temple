@@ -7,8 +7,10 @@ import java.util.*;
 public class Explorer {
   private Stack<Long> currentRoute = new Stack<>();
   private Set<Long> visitedNodes = new HashSet<>();
-  private List<Node> goldQueue = new ArrayList<>();
+  private List<EscapeNode> goldQueue = new ArrayList<>();
   private EscapeState state;
+  private EscapeNode current;
+  private RouteFinder routeFinder;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -103,23 +105,23 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     this.state = state;
-    RouteFinder routeFinder = new RouteFinder();
+    this.routeFinder = new RouteFinder();
 
     // Create list of the richest nodes
     createGoldQueue();
-    EscapeNode current;
 
     // While there's still something in goldQueue, see if you can get to the closest rich node
     while (!goldQueue.isEmpty()) {
 
       // Set the current location
-      current = new EscapeNode(state.getCurrentNode(), null);
+      setCurrent();
 
-      // Retrieve the richest EscapeNode + plot route
-      EscapeNode rich = routeFinder.getRoute(current, goldQueue.get(0));
+      // Retrieve the nearest EscapeNode + plot route
+      EscapeNode rich = routeFinder.getRoute(current, goldQueue.get(0).getNode());
 
-      // Calculate how many steps from gold to exit
-      EscapeNode tempExitRoute = routeFinder.getRoute(new EscapeNode(goldQueue.get(0), null), state.getExit());
+      // Calculate cost from gold to exit
+      EscapeNode tempExitRoute = routeFinder.getRoute(
+          new EscapeNode(goldQueue.get(0).getNode(), null), state.getExit());
 
       // Check the total journey is do-able in time remaining
       if ((rich.getCost() + tempExitRoute.getCost()) > state.getTimeRemaining()) {
@@ -127,15 +129,19 @@ public class Explorer {
         goldQueue.remove(0);
       } else {
         // If it is, visit node and repeat from new position
-        traverseRoute(current, rich);
+        traverseRoute(rich);
         // Refresh gold queue
         createGoldQueue();
       }
     }
 
     // Once we run out of reachable gold nodes, head for the exit
-    current = new EscapeNode(state.getCurrentNode(), null);
-    traverseRoute(current, routeFinder.getRoute(current, state.getExit()));
+    current = setCurrent();
+    traverseRoute(routeFinder.getRoute(current, state.getExit()));
+  }
+
+  private EscapeNode setCurrent() {
+    return (new EscapeNode(state.getCurrentNode(), null));
   }
 
   private void pickUpGold() {
@@ -144,35 +150,32 @@ public class Explorer {
     }
   }
 
-
   private void createGoldQueue() {
-    // If Sid spawns on a gold tile, pick it up before doing anything else
+    current = setCurrent();
     pickUpGold();
-
     goldQueue.clear();
 
     Collection<Node> allNodes = state.getVertices();
     for (Node n : allNodes) {
       if (n.getTile().getGold() != 0) {
-        goldQueue.add(n);
+        EscapeNode tempNode = routeFinder.getRoute(current, n);
+        goldQueue.add(tempNode);
       }
     }
 
-    // Sorts according to gold content
-    Comparator<Node> goldNodeComparator = Comparator.comparing(node -> node.getTile().getGold());
-    Collections.sort(goldQueue, goldNodeComparator.reversed());
+    // Sorts according to cost
+    goldQueue.sort(Comparator.comparing(EscapeNode::getCost));
   }
 
 
-  private void traverseRoute(EscapeNode currentPosition, EscapeNode current) {
-
+  private void traverseRoute(EscapeNode target) {
     // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
 
     // Work backwards from exit, adding each parent to route stack
-    while (current.getNode() != currentPosition.getNode()) {
-      bestRouteStack.push(current);
-      current = current.getParent();
+    while (!target.getNode().equals(current.getNode())) {
+      bestRouteStack.push(target);
+      target = target.getParent();
     }
 
     // Traverse route
