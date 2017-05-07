@@ -102,8 +102,8 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-
     this.state = state;
+    RouteFinder routeFinder = new RouteFinder();
 
     // Create list of the richest nodes
     createGoldQueue();
@@ -116,10 +116,10 @@ public class Explorer {
       current = new EscapeNode(state.getCurrentNode(), null);
 
       // Retrieve the richest EscapeNode + plot route
-      EscapeNode rich = getRoute(current, goldQueue.get(0));
+      EscapeNode rich = routeFinder.getRoute(current, goldQueue.get(0));
 
       // Calculate how many steps from gold to exit
-      EscapeNode tempExitRoute = getRoute(new EscapeNode(goldQueue.get(0), null), state.getExit());
+      EscapeNode tempExitRoute = routeFinder.getRoute(new EscapeNode(goldQueue.get(0), null), state.getExit());
 
       // Check the total journey is do-able in time remaining
       if ((rich.getCost() + tempExitRoute.getCost()) > state.getTimeRemaining()) {
@@ -135,15 +135,19 @@ public class Explorer {
 
     // Once we run out of reachable gold nodes, head for the exit
     current = new EscapeNode(state.getCurrentNode(), null);
-    traverseRoute(current, getRoute(current, state.getExit()));
+    traverseRoute(current, routeFinder.getRoute(current, state.getExit()));
+  }
+
+  private void pickUpGold() {
+    if (state.getCurrentNode().getTile().getGold() != 0) {
+      state.pickUpGold();
+    }
   }
 
 
   private void createGoldQueue() {
     // If Sid spawns on a gold tile, pick it up before doing anything else
-    if (state.getCurrentNode().getTile().getGold() != 0) {
-      state.pickUpGold();
-    }
+    pickUpGold();
 
     goldQueue.clear();
 
@@ -154,7 +158,7 @@ public class Explorer {
       }
     }
 
-    // Sorts according to gold content (ascending, hopefully...)
+    // Sorts according to gold content
     Comparator<Node> goldNodeComparator = Comparator.comparing(node -> node.getTile().getGold());
     Collections.sort(goldQueue, goldNodeComparator.reversed());
   }
@@ -173,88 +177,12 @@ public class Explorer {
 
     // Traverse route
     while (!bestRouteStack.isEmpty()) {
-
-      if (state.getCurrentNode().getTile().getGold() != 0) {
-        state.pickUpGold();
-      }
-
+      pickUpGold();
       EscapeNode currentStep = bestRouteStack.pop();
       state.moveTo(currentStep.getNode());
-
     }
   }
 
-  private EscapeNode getRoute(EscapeNode start, Node target) {
-    Map<Node, EscapeNode> closedList = new HashMap<>();
-    List<EscapeNode> openList = new ArrayList<>();
 
-    // Add start location to openList for checking
-    EscapeNode current = start;
-    openList.add(start);
-
-    // Go through each Node until we find the target
-    while (current.getNode() != target) {
-
-      // Get most promising EscapeNode
-      openList.sort(Comparator.comparing(EscapeNode::getCost));
-
-      // Move the current node from openList to closedList
-      current = openList.remove(0);
-      closedList.put(current.getNode(), current);
-
-      // Get current's neighbour Nodes
-      Set<Node> neighbours = current.getNode().getNeighbours();
-
-      // Evaluate each neighbour
-      for (Node n : neighbours) {
-        // If already processed, check the new route isn't quicker
-        if (closedList.containsKey(n)) {
-          // Update and move to openList if so
-          if (checkCost(closedList.get(n), current)) {
-            openList.add(closedList.get(n));
-            closedList.remove(n);
-          }
-        } else if (checkOpenList(openList, n) != null) {
-          // If already in openList, check the new route isn't quicker
-          EscapeNode temp = checkOpenList(openList, n);
-          // Update and replace in openList if so
-          if (checkCost(temp, current)) {
-            openList.remove(temp);
-            openList.add(temp);
-          }
-        } else {
-          // Add totally new neighbours to openList
-          EscapeNode newNode = new EscapeNode(n, current);
-          openList.add(newNode);
-        }
-      }
-    }
-    return current;
-  }
-
-  private EscapeNode checkOpenList(List<EscapeNode> openList, Node node) {
-    for (EscapeNode en : openList) {
-      if (en.getNode().equals(node)) {
-        return en;
-      }
-    }
-    return null;
-  }
-
-  // Checks and updates node cost if quicker than already found
-  private boolean checkCost(EscapeNode child, EscapeNode current) {
-    boolean quicker = false;
-
-    // Get edge connecting current to neighbour being re-analysed
-    Edge edge = current.getNode().getEdge(child.getNode());
-
-    // Check if current distance + calculate distance is greater than child's distance
-    if (child.getCost() > (current.getCost() + edge.length())) {
-      child.setParent(current);
-      quicker = true;
-    }
-
-    return quicker;
-  }
 }
 

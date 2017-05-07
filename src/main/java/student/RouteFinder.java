@@ -1,129 +1,85 @@
 package student;
 
-import game.EscapeState;
-import game.GameState;
+import game.Edge;
 import game.Node;
 
 import java.util.*;
 
 /**
- * Created by svince04 on 06/05/2017 for cw-temple.
+ * Created by svince04 on 07/05/2017 for cw-temple.
  */
 public class RouteFinder {
-  private EscapeState state;
-  private Node startNode;
-  private EscapeNode sNode;
-  private Node destNode;
-  private EscapeNode dNode;
-  private List<EscapeNode> openList = new LinkedList<>();
-  private List<EscapeNode> closedList = new ArrayList<>();
-  private Stack<EscapeNode> bestRouteStack = new Stack<>();
 
-  // Constructor
-  public RouteFinder(EscapeState state, Node destNode) {
-    this.state = state;
-    this.startNode = state.getCurrentNode();
-    this.destNode = destNode;
-  }
+  EscapeNode getRoute(EscapeNode start, Node target) {
+    Map<Node, EscapeNode> closedList = new HashMap<>();
+    List<EscapeNode> openList = new ArrayList<>();
 
-  public Stack<EscapeNode> getRoute() {
-    // At start, add the spawn location to openList and clear closedList
-    sNode = new EscapeNode(startNode, null);
-    openList.add(sNode);
-    closedList.clear();
+    // Add start location to openList for checking
+    EscapeNode current = start;
+    openList.add(start);
 
-    // While there are possible next steps in openlist and we aren't at the destination
-    while (!openList.isEmpty()) {
-      openList.sort(Comparator.comparing(EscapeNode :: getCost));
-      //  Remove the most promising next step from openList and add it to closedList
-      EscapeNode nextStep = openList.remove(0);
+    // Go through each Node until we find the target
+    while (current.getNode() != target) {
 
-      closedList.add(nextStep);
+      // Get most promising EscapeNode
+      openList.sort(Comparator.comparing(EscapeNode::getCost));
 
-      // Assess each neighbor of the step.
-      assessNeighbours(nextStep);
+      // Move the current node from openList to closedList
+      current = openList.remove(0);
+      closedList.put(current.getNode(), current);
 
-    }
+      // Get current's neighbour Nodes
+      Set<Node> neighbours = current.getNode().getNeighbours();
 
-    buildPath();
-    return bestRouteStack;
-
-  }
-
-  public void buildPath() {
-    EscapeNode current = dNode;
-    // Work backwards from exit, adding each parent to route stack
-    while (current.getParent() != null) {
-      bestRouteStack.push(current);
-      current = current.getParent();
-    }
-  }
-
-  public void assessNeighbours(EscapeNode current) {
-    Set<Node> neighbours = current.getNode().getNeighbours();
-
-    // For each neighbor:
-    for (Node n : neighbours) {
-
-      // Calculate the path cost of reaching the neighbor
-      EscapeNode temp = checkLists(n);
-
-      // If the location isn’t in either open or closed list then create new EscNode
-      // for the location and add it to openList
-      if (temp == null) {
-        EscapeNode newNode = new EscapeNode(n, current);
-        openList.add(newNode);
-        System.out.println("Cost to reach new node is: " + newNode.getCost());
-      } else {
-        int parentCost = current.getCost();
-        System.out.println("Parent cost: " + parentCost);
-        EscapeNode newNode = new EscapeNode(n, current);
-        // If the cost is less than the cost known for this location then remove it from
-        // the open or closed lists (since we’ve now found a better route)
-        if (temp.getCost() < newNode.getCost()) {
-          if (closedList.contains(temp)) {
-            closedList.remove(temp);
+      // Evaluate each neighbour
+      for (Node n : neighbours) {
+        // If already processed, check the new route isn't quicker
+        if (closedList.containsKey(n)) {
+          // Update and move to openList if so
+          if (checkCost(closedList.get(n), current)) {
+            openList.add(closedList.get(n));
+            closedList.remove(n);
           }
-
-          if (openList.contains(temp)) {
+        } else if (checkOpenList(openList, n) != null) {
+          // If already in openList, check the new route isn't quicker
+          EscapeNode temp = checkOpenList(openList, n);
+          // Update and replace in openList if so
+          if (checkCost(temp, current)) {
             openList.remove(temp);
-            openList.add(newNode);
+            openList.add(temp);
           }
+        } else {
+          // Add totally new neighbours to openList
+          EscapeNode newNode = new EscapeNode(n, current);
+          openList.add(newNode);
         }
       }
     }
+    return current;
   }
 
-
-    // Method to check if the node we're evaluating has already been seen & converted to EscapeNode
-
-  public EscapeNode checkLists(Node node) {
-    for (EscapeNode eNode : openList) {
-      if (eNode.getNode().equals(node)) {
-        System.out.println("Node " + node.getId() + " is present in openList");
-        return eNode;
-      }
-    }
-
-    for (EscapeNode eNode : closedList) {
-      if (eNode.getNode().equals(node)) {
-        System.out.println("Node " + node.getId() + " is present in closedList");
-        return eNode;
+  private EscapeNode checkOpenList(List<EscapeNode> openList, Node node) {
+    for (EscapeNode en : openList) {
+      if (en.getNode().equals(node)) {
+        return en;
       }
     }
     return null;
   }
 
-  public EscapeNode closedListContains(Node node) {
-    for (EscapeNode eNode : closedList) {
-      if (eNode.getNode().equals(node)) {
-        System.out.println("Node " + node.getId() + " is present in closedList");
-        return eNode;
-      }
+  // Checks and updates node cost if quicker than already found
+  private boolean checkCost(EscapeNode child, EscapeNode current) {
+    boolean quicker = false;
+
+    // Get edge connecting current to neighbour being re-analysed
+    Edge edge = current.getNode().getEdge(child.getNode());
+
+    // Check if current distance + calculate distance is greater than child's distance
+    if (child.getCost() > (current.getCost() + edge.length())) {
+      child.setParent(current);
+      quicker = true;
     }
-    return null;
+
+    return quicker;
   }
-
-
 }
-
