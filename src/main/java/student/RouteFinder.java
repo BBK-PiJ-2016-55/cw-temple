@@ -10,44 +10,29 @@ import java.util.*;
  */
 public class RouteFinder {
 
-  EscapeNode getRoute(EscapeNode start, Node target) {
+  EscapeNode getRoute(EscapeNode current, Node target) {
     Map<Node, EscapeNode> closedList = new HashMap<>();
     List<EscapeNode> openList = new ArrayList<>();
 
     // Add start location to openList for checking
-    EscapeNode current = start;
-    openList.add(start);
+    openList.add(current);
 
-    // Go through each Node until we find the target
     while (current.getNode() != target) {
-
-      // Get most promising EscapeNode
+      // Get most promising EscapeNode + move from openList to closedList
       openList.sort(Comparator.comparing(EscapeNode::getCost));
-
-      // Move the current node from openList to closedList
       current = openList.remove(0);
       closedList.put(current.getNode(), current);
 
-      // Get current's neighbour Nodes
+      // Get neighbour Nodes + evaluate each one
       Set<Node> neighbours = current.getNode().getNeighbours();
-
-      // Evaluate each neighbour
       for (Node n : neighbours) {
-        // If already processed, check the new route isn't quicker
+        // If the new route is quicker than previous, update + move to openList if required
         if (closedList.containsKey(n)) {
-          // Update and move to openList if so
           if (checkCost(closedList.get(n), current)) {
-            openList.add(closedList.get(n));
-            closedList.remove(n);
+            openList.add(closedList.remove(n));
           }
         } else if (checkOpenList(openList, n) != null) {
-          // If already in openList, check the new route isn't quicker
-          EscapeNode temp = checkOpenList(openList, n);
-          // Update and replace in openList if so
-          if (checkCost(temp, current)) {
-            openList.remove(temp);
-            openList.add(temp);
-          }
+          checkCost(checkOpenList(openList, n), current);
         } else {
           // Add totally new neighbours to openList
           EscapeNode newNode = new EscapeNode(n, current);
