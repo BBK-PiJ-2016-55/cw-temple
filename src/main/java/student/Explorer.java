@@ -117,13 +117,11 @@ public class Explorer {
     // While there's still something in goldQueue, see if you can get to the closest rich node
     while (!goldQueue.isEmpty()) {
 
-      allNodesMap.clear();
       current = new EscapeNode(state.getCurrentNode(), null);
 
       // retrieve the richest EscapeNode from the graph + plot route
       EscapeNode rich = getRoute(current, goldQueue.get(0).getId());
 
-      allNodesMap.clear();
       EscapeNode tempRich = new EscapeNode(goldQueue.get(0), null);
       // Calculate how many steps to gold + exit
       EscapeNode tempExitRoute = getRoute(tempRich, state.getExit().getId());
@@ -200,7 +198,6 @@ public class Explorer {
   private EscapeNode getRoute(EscapeNode start, Long dest) {
 
     // Clear lists
-    allNodesMap.clear();
     closedList.clear();
     openList.clear();
 
@@ -217,7 +214,7 @@ public class Explorer {
 
       // Mark this node as closed - i.e., we will have evaluated all the neighbours
       closedList.put(current.getNode(), current);
-      allNodesMap.put(current.getNode(), current);
+      // allNodesMap.put(current.getNode(), current);
 
       // Get current's neighbour Nodes
       Set<Node> neighbours = current.getNode().getNeighbours();
@@ -225,20 +222,34 @@ public class Explorer {
       // Evaluate each neighbour
       for (Node n : neighbours) {
         if (closedList.containsKey(n)) {
-          checkCost(allNodesMap.get(n), current);
-        } else if (openList.contains(allNodesMap.get(n))) {
-          checkCost(allNodesMap.get(n), current);
+          if (checkCost(closedList.get(n), current)) {
+            openList.add(closedList.get(n));
+            closedList.remove(n);
+          }
+        } else if (checkOpenList(n) != null) {
+          EscapeNode temp = checkOpenList(n);
+          if (checkCost(temp, current)) {
+            openList.remove(temp);
+            openList.add(temp);
+          }
+          checkCost(temp, current);
         } else {
           // Add totally new neighbours to openList
           EscapeNode newNode = new EscapeNode(n, current);
           openList.add(newNode);
-          allNodesMap.put(n, newNode);
         }
       }
-      // Re-sort the list before choosing next step
-
     }
     return current;
+  }
+
+  private EscapeNode checkOpenList(Node node) {
+    for (EscapeNode en : openList) {
+      if (en.equals(node)) {
+        return en;
+      }
+    }
+    return null;
   }
 
   // Checks and updates node cost if quicker than already found
