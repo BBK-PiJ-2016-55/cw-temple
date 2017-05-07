@@ -12,7 +12,7 @@ public class Explorer {
   private EscapeNode exitNode;
   private Map<Node, EscapeNode> allNodesMap = new HashMap<>();
   private List<EscapeNode> openList = new ArrayList<>();
-  private Set<Node> closedList = new HashSet<>();
+  private Map<Node, EscapeNode> closedList = new HashMap<>();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -112,25 +112,19 @@ public class Explorer {
     // Create list of the richest nodes
     createGoldQueue(state);
 
-    // Create escapeGraph using current location
-    createEscapeGraph(state);
-
     // While there's still something in goldQueue, see if you can get to the closest rich node
     while (!goldQueue.isEmpty()) {
 
-      // retrieve the richest EscapeNode from the graph
-      EscapeNode rich = allNodesMap.get(goldQueue.get(0));
+      EscapeNode current = new EscapeNode(state.getCurrentNode(), null);
+
+      // retrieve the richest EscapeNode from the graph + plot route
+      EscapeNode rich = getRoute(current, goldQueue.get(0).getId());
 
       // Calculate how many steps to gold + exit
       EscapeNode tempExitRoute = getRoute(rich, state.getExit().getId());
 
-      int costOfRoute = rich.getCost() + (getRoute(rich, state.getExit().getId()).getCost());
-      System.out.println("Rich node is " + rich.getNode().getId() + " with " + rich.getNode().getTile().getGold() + " gold.");
-      System.out.println(" Cost to reach rich node is: " + rich.getCost());
-      System.out.println("Cost to get from rich node to exit is: " + getRoute(rich, state.getExit().getId()).getCost());
-      System.out.println("Time remaining: " + state.getTimeRemaining());
-      System.out.println();
-      System.out.println();
+      int costOfRoute = rich.getCost() + (tempExitRoute.getCost());
+      System.out.println("Cost of route: " + costOfRoute);
 
       // Check the richest node + exit are reachable
       if (costOfRoute > state.getTimeRemaining()) {
@@ -139,13 +133,12 @@ public class Explorer {
       } else {
         // If it is, visit node, create a new gold queue and then go round the loop again
         traverseRoute(state, rich);
-        // Refresh escape graph using new location
-        createEscapeGraph(state);
+        allNodesMap.clear();
         // Refresh gold queue
         createGoldQueue(state);
       }
     }
-    createEscapeGraph(state);
+    // createEscapeGraph(state);
     traverseRoute(state, exitNode);
 
   }
@@ -216,30 +209,28 @@ public class Explorer {
     }
   }
 
-  // Converts each node into an EscapeNode object, so we know the quickest route to each one
-  private void createEscapeGraph(EscapeState state) {
-
-    // Update goldQueue
-    createGoldQueue(state);
-
-    // Clear allNodesMap
-    allNodesMap.clear();
-
-    // Update node of current position
-    start = new EscapeNode(state.getCurrentNode(), null);
-
-    // Get all Nodes
-    Collection<Node> allNodes = state.getVertices();
-
-    // Find best route for each node from current position
-    for (Node n : allNodes) {
-      EscapeNode temp = getRoute(start, n.getId());
-      allNodesMap.put(n, temp);
-    }
-
-    // Update exit node variable
-    exitNode = allNodesMap.get(state.getExit());
-  }
+//  // Converts each node into an EscapeNode object, so we know the quickest route to each one
+//  private void createEscapeGraph(EscapeState state) {
+//
+//    // Clear allNodesMap
+//    allNodesMap.clear();
+//
+//    // Update node of current position
+//    start = new EscapeNode(state.getCurrentNode(), null);
+//    allNodesMap.put(start.getNode(), start);
+//
+//    // Get all Nodes
+//    Collection<Node> allNodes = state.getVertices();
+//
+//    // Find best route for each node from current position
+//    for (Node n : allNodes) {
+//      EscapeNode temp = getRoute(start, n.getId());
+//      allNodesMap.put(n, temp);
+//    }
+//
+//    // Update exit node variable
+//    exitNode = allNodesMap.get(state.getExit());
+//  }
 
 
   private EscapeNode getRoute(EscapeNode start, Long dest) {
@@ -247,13 +238,21 @@ public class Explorer {
     // Clear lists and add start node to openList for checking
     closedList.clear();
     openList.clear();
+
+    // Add start location to openList for checking
     EscapeNode current = start;
+    openList.add(start);
 
     // Go through each Node until we find the exit
     while (current.getNode().getId() != dest) {
 
-      // Mark this node as closed - i.e., we've evaluated all the neighbours
-      closedList.add(current.getNode());
+      // Get most promising EscapeNode
+      openList.sort(Comparator.comparing(EscapeNode::getCost));
+      current = openList.remove(0);
+
+      // Mark this node as closed - i.e., we will have evaluated all the neighbours
+      closedList.put(current.getNode(), current);
+      allNodesMap.put(current.getNode(), current);
 
       // Get current's neighbour Nodes
       Set<Node> neighbours = current.getNode().getNeighbours();
@@ -264,10 +263,8 @@ public class Explorer {
         if (n.getId() == dest) {
           EscapeNode temp = new EscapeNode(n, current);
           return temp;
-          //return new EscapeNode(n, current);
-        } else if (closedList.contains(n)) {
-          // System.out.println("Neighbour node " + n.getId() + " is already in closedList");
-          // If we've already see this neighbour, recalculate cost and change parent if needed
+        } else if (closedList.containsKey(n)) {
+          checkCost(allNodesMap.get(n), current);
         } else if (openList.contains(allNodesMap.get(n))) {
           // System.out.println("Checking cost of " + n.getId() + ": ");
           checkCost(allNodesMap.get(n), current);
@@ -280,8 +277,7 @@ public class Explorer {
         }
       }
       // Re-sort the list before choosing next step
-      openList.sort(Comparator.comparing(EscapeNode::getCost));
-      current = openList.remove(0);
+
     }
     return current;
   }
@@ -290,16 +286,16 @@ public class Explorer {
   private void checkCost(EscapeNode child, EscapeNode current) {
 
     //System.out.println("CheckCost() is working...");
-    //System.out.println("Cost of child/neighbour " + child.getNode().getId() + " before checks: " + child.getCost());
-    //System.out.println("Current cost of parent/current: " + current.getCost());
+//    System.out.println("Cost of child/neighbour " + child.getNode().getId() + " before checks: " + child.getCost());
+//    System.out.println("Current cost of parent/current: " + current.getCost());
     // Get edge connecting current to neighbour being re-analysed
     Edge edge = current.getNode().getEdge(child.getNode());
-    // System.out.println("Edge weight: " + edge.length);
+//     System.out.println("Edge weight: " + edge.length);
     // Check if current distance + calculate distance is greater than child's distance
     if (child.getCost() > (current.getCost() + edge.length())) {
       child.setParent(current);
     }
-    // System.out.println("Cost of child/neighbour " + child.getNode().getId() + " after checks: " + child.getCost());
+//    System.out.println("Cost of child/neighbour " + child.getNode().getId() + " after checks: " + child.getCost());
   }
 }
 
