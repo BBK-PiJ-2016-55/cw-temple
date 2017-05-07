@@ -8,8 +8,6 @@ public class Explorer {
   private Stack<Long> currentRoute = new Stack<>();
   private Set<Long> visitedNodes = new HashSet<>();
   private List<Node> goldQueue = new ArrayList<>();
-  private List<EscapeNode> openList = new ArrayList<>();
-  private Map<Node, EscapeNode> closedList = new HashMap<>();
   private EscapeState state;
 
   /**
@@ -187,10 +185,8 @@ public class Explorer {
   }
 
   private EscapeNode getRoute(EscapeNode start, Node target) {
-
-    // Clear lists
-    closedList.clear();
-    openList.clear();
+    Map<Node, EscapeNode> closedList = new HashMap<>();
+    List<EscapeNode> openList = new ArrayList<>();
 
     // Add start location to openList for checking
     EscapeNode current = start;
@@ -218,9 +214,9 @@ public class Explorer {
             openList.add(closedList.get(n));
             closedList.remove(n);
           }
-        } else if (checkOpenList(n) != null) {
+        } else if (checkOpenList(openList, n) != null) {
           // If already in openList, check the new route isn't quicker
-          EscapeNode temp = checkOpenList(n);
+          EscapeNode temp = checkOpenList(openList, n);
           // Update and replace in openList if so
           if (checkCost(temp, current)) {
             openList.remove(temp);
@@ -236,7 +232,7 @@ public class Explorer {
     return current;
   }
 
-  private EscapeNode checkOpenList(Node node) {
+  private EscapeNode checkOpenList(List<EscapeNode> openList, Node node) {
     for (EscapeNode en : openList) {
       if (en.getNode().equals(node)) {
         return en;
