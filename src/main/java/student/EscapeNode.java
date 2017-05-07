@@ -8,7 +8,9 @@ import game.Node;
 public class EscapeNode {
   private Node node;
   private EscapeNode parent;
-  private int cost;
+  private double gold;
+  private double cost;
+  private double goldPerStep;
 
   EscapeNode(Node node, EscapeNode parent) {
     this.node = node;
@@ -22,14 +24,32 @@ public class EscapeNode {
       this.parent = parent;
       // Calculate the cost by adding weight of edge with parent node to parent's distance
       setCost(parent.getCost() + node.getEdge(parent.getNode()).length());
+      setGold();
+      setGoldPerStep();
     }
   }
 
-  void setCost(int steps) {
-    cost = steps;
+  void setGold() {
+    this.gold = node.getTile().getGold();
   }
 
-  int getCost() {
+  double getGold() {
+    return gold;
+  }
+
+  double getGoldPerStep() {
+    return goldPerStep;
+  }
+
+  void setGoldPerStep() {
+    this.goldPerStep = (getGold() / getCost());
+  }
+
+  void setCost(double cost) {
+    this.cost = cost;
+  }
+
+  double getCost() {
     return cost;
   }
 

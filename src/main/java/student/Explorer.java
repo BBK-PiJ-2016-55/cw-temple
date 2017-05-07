@@ -164,7 +164,7 @@ public class Explorer {
     }
 
     // Sorts according to cost
-    goldQueue.sort(Comparator.comparing(EscapeNode::getCost));
+    goldQueue.sort(Comparator.comparing(EscapeNode::getGoldPerStep).reversed());
   }
 
 
