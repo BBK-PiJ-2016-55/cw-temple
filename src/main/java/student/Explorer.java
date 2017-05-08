@@ -113,24 +113,18 @@ public class Explorer {
     // While there's still something in goldQueue, see if you can get to the closest rich node
     while (!goldQueue.isEmpty()) {
 
-      // Set the current location
       setCurrent();
 
       // Retrieve the nearest EscapeNode + plot route
-      EscapeNode rich = routeFinder.getRoute(current, goldQueue.get(0).getNode());
-
-      // Calculate cost from gold to exit
-      EscapeNode tempExitRoute = routeFinder.getRoute(
+      EscapeNode target = routeFinder.getRoute(current, goldQueue.get(0).getNode());
+      EscapeNode exitRoute = routeFinder.getRoute(
           new EscapeNode(goldQueue.get(0).getNode(), null), state.getExit());
 
-      // Check the total journey is do-able in time remaining
-      if ((rich.getCost() + tempExitRoute.getCost()) > state.getTimeRemaining()) {
-        // If not, remove richest node from the list and go round the while loop again
+      // Check the total journey is possible in time remaining
+      if ((target.getCost() + exitRoute.getCost()) > state.getTimeRemaining()) {
         goldQueue.remove(0);
       } else {
-        // If it is, visit node and repeat from new position
-        traverseRoute(rich);
-        // Refresh gold queue
+        traverseRoute(target);
         createGoldQueue();
       }
     }
