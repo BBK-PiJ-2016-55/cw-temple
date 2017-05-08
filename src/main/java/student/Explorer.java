@@ -162,17 +162,13 @@ public class Explorer {
         goldQueue.add(tempNode);
       }
     }
-
-    // Sorts according to cost
     goldQueue.sort(Comparator.comparing(EscapeNode::getGoldPerStep).reversed());
   }
 
-
   private void traverseRoute(EscapeNode target) {
-    // Create stack to read route into
     Stack<EscapeNode> bestRouteStack = new Stack<>();
 
-    // Work backwards from exit, adding each parent to route stack
+    // Work backwards from target, adding each parent to route stack
     while (!target.getNode().equals(current.getNode())) {
       bestRouteStack.push(target);
       target = target.getParent();
