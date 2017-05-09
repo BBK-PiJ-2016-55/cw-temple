@@ -68,9 +68,9 @@ public class Explorer {
     List<NodeStatus> tempNeighbours = new ArrayList<>();
 
     // Filter out any previously-visited neighbours.
-    for (NodeStatus n : neighbours) {
-      if (!visitedNodes.contains(n.getId())) {
-        tempNeighbours.add(n);
+    for (NodeStatus nodeStatus : neighbours) {
+      if (!visitedNodes.contains(nodeStatus.getId())) {
+        tempNeighbours.add(nodeStatus);
       }
     }
 
@@ -150,9 +150,9 @@ public class Explorer {
     goldQueue.clear();
 
     Collection<Node> allNodes = state.getVertices();
-    for (Node n : allNodes) {
-      if (n.getTile().getGold() != 0) {
-        EscapeNode tempNode = routeFinder.getRoute(current, n);
+    for (Node node : allNodes) {
+      if (node.getTile().getGold() != 0) {
+        EscapeNode tempNode = routeFinder.getRoute(current, node);
         goldQueue.add(tempNode);
       }
     }
