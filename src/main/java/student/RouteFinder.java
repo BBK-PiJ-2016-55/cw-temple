@@ -41,8 +41,8 @@ public class RouteFinder {
         if (checkCost(closedList.get(n), current)) {
           openList.add(closedList.remove(n));
         }
-      } else if (checkOpenList(openList, n) != null) {
-        checkCost(checkOpenList(openList, n), current);
+      } else if (checkOpenList(n) != null) {
+        checkCost(checkOpenList(n), current);
       } else {
         // Add totally new neighbours to openList
         EscapeNode newNode = new EscapeNode(n, current);
@@ -51,7 +51,7 @@ public class RouteFinder {
     }
   }
 
-  private EscapeNode checkOpenList(List<EscapeNode> openList, Node node) {
+  private EscapeNode checkOpenList(Node node) {
     return openList.stream()
         .filter(escNode -> escNode.getNode().equals(node))
         .findAny()
@@ -60,10 +60,11 @@ public class RouteFinder {
 
   // Checks and updates node cost if quicker than already found
   private boolean checkCost(EscapeNode child, EscapeNode current) {
-    boolean quicker = false;
 
     // Get edge connecting current to neighbour being re-analysed
     Edge edge = current.getNode().getEdge(child.getNode());
+
+    boolean quicker = false;
 
     // Check if current distance + calculate distance is greater than child's distance
     if (child.getCost() > (current.getCost() + edge.length())) {
