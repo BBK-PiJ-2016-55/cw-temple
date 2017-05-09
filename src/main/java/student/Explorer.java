@@ -3,6 +3,7 @@ package student;
 import game.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Explorer {
   private Stack<Long> currentRoute = new Stack<>();
@@ -65,14 +66,11 @@ public class Explorer {
   }
 
   private Long findNewNeighbours(Collection<NodeStatus> neighbours) {
-    List<NodeStatus> tempNeighbours = new ArrayList<>();
 
     // Filter out any previously-visited neighbours.
-    for (NodeStatus nodeStatus : neighbours) {
-      if (!visitedNodes.contains(nodeStatus.getId())) {
-        tempNeighbours.add(nodeStatus);
-      }
-    }
+    List<NodeStatus> tempNeighbours = neighbours.stream()
+        .filter(nodeStatus -> !(visitedNodes.contains(nodeStatus.getId())))
+        .collect(Collectors.toList());
 
     // Sort according to distance from orb, then return ID/null if in a dead end.
     tempNeighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
