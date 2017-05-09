@@ -39,6 +39,7 @@ public class RouteFinder {
       // If the new route is quicker than previous, update + move to openList if required
       if (closedList.containsKey(n)) {
         if (checkCost(closedList.get(n), current)) {
+          closedList.get(n).setParent(current);
           openList.add(closedList.remove(n));
         }
       } else if (checkOpenList(n) != null) {
@@ -60,18 +61,9 @@ public class RouteFinder {
 
   // Checks and updates node cost if quicker than already found
   private boolean checkCost(EscapeNode child, EscapeNode current) {
-
-    // Get edge connecting current to neighbour being re-analysed
-    Edge edge = current.getNode().getEdge(child.getNode());
-
-    boolean quicker = false;
-
-    // Check if current distance + calculate distance is greater than child's distance
-    if (child.getCost() > (current.getCost() + edge.length())) {
-      child.setParent(current);
-      quicker = true;
-    }
-
-    return quicker;
+    return (child.getCost() > (current.getCost() + current
+        .getNode()
+        .getEdge(child.getNode())
+        .length()));
   }
 }
