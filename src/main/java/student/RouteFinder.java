@@ -10,10 +10,12 @@ import java.util.stream.Collectors;
  * Created by svince04 on 07/05/2017 for cw-temple.
  */
 public class RouteFinder {
-  List<EscapeNode> openList = new ArrayList<>();
+  private List<EscapeNode> openList = new ArrayList<>();
+  private Map<Node, EscapeNode> closedList = new HashMap<>();
 
   EscapeNode getRoute(EscapeNode current, Node target) {
-    Map<Node, EscapeNode> closedList = new HashMap<>();
+    closedList.clear();
+    openList.clear();
 
     // Add start location to openList for checking
     openList.add(current);
@@ -26,22 +28,27 @@ public class RouteFinder {
 
       // Get neighbour Nodes + evaluate each one
       Set<Node> neighbours = current.getNode().getNeighbours();
-      for (Node n : neighbours) {
-        // If the new route is quicker than previous, update + move to openList if required
-        if (closedList.containsKey(n)) {
-          if (checkCost(closedList.get(n), current)) {
-            openList.add(closedList.remove(n));
-          }
-        } else if (checkOpenList(openList, n) != null) {
-          checkCost(checkOpenList(openList, n), current);
-        } else {
-          // Add totally new neighbours to openList
-          EscapeNode newNode = new EscapeNode(n, current);
-          openList.add(newNode);
-        }
-      }
+      evaluateNeighbours(current, neighbours);
+
     }
     return current;
+  }
+
+  private void evaluateNeighbours(EscapeNode current, Set<Node> neighbours) {
+    for (Node n : neighbours) {
+      // If the new route is quicker than previous, update + move to openList if required
+      if (closedList.containsKey(n)) {
+        if (checkCost(closedList.get(n), current)) {
+          openList.add(closedList.remove(n));
+        }
+      } else if (checkOpenList(openList, n) != null) {
+        checkCost(checkOpenList(openList, n), current);
+      } else {
+        // Add totally new neighbours to openList
+        EscapeNode newNode = new EscapeNode(n, current);
+        openList.add(newNode);
+      }
+    }
   }
 
   private EscapeNode checkOpenList(List<EscapeNode> openList, Node node) {
