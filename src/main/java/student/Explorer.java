@@ -161,11 +161,11 @@ public class Explorer {
 
   private void traverseRoute(EscapeNode target) {
     Stack<EscapeNode> bestRouteStack = new Stack<>();
-
+    EscapeNode nextStep = target;
     // Work backwards from target, adding each parent to route stack
-    while (!target.getNode().equals(current.getNode())) {
-      bestRouteStack.push(target);
-      target = target.getParent();
+    while (!nextStep.equals(current)) {
+      bestRouteStack.push(nextStep);
+      nextStep = nextStep.getParent();
     }
 
     // Traverse route

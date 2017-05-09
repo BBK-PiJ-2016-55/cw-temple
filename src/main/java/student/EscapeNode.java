@@ -29,11 +29,11 @@ public class EscapeNode {
     }
   }
 
-  void setGold() {
+  private void setGold() {
     this.gold = node.getTile().getGold();
   }
 
-  double getGold() {
+  private double getGold() {
     return gold;
   }
 
@@ -41,11 +41,11 @@ public class EscapeNode {
     return goldPerStep;
   }
 
-  void setGoldPerStep() {
+  private void setGoldPerStep() {
     this.goldPerStep = (getGold() / getCost());
   }
 
-  void setCost(double cost) {
+  private void setCost(double cost) {
     this.cost = cost;
   }
 
@@ -59,5 +59,10 @@ public class EscapeNode {
 
   public Node getNode() {
     return node;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof EscapeNode && node.equals(((EscapeNode) obj).getNode());
   }
 }
