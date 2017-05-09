@@ -4,15 +4,16 @@ import game.Edge;
 import game.Node;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by svince04 on 07/05/2017 for cw-temple.
  */
 public class RouteFinder {
+  List<EscapeNode> openList = new ArrayList<>();
 
   EscapeNode getRoute(EscapeNode current, Node target) {
     Map<Node, EscapeNode> closedList = new HashMap<>();
-    List<EscapeNode> openList = new ArrayList<>();
 
     // Add start location to openList for checking
     openList.add(current);
@@ -44,12 +45,10 @@ public class RouteFinder {
   }
 
   private EscapeNode checkOpenList(List<EscapeNode> openList, Node node) {
-    for (EscapeNode en : openList) {
-      if (en.getNode().equals(node)) {
-        return en;
-      }
-    }
-    return null;
+    return openList.stream()
+        .filter(escNode -> escNode.getNode().equals(node))
+        .findAny()
+        .orElse(null);
   }
 
   // Checks and updates node cost if quicker than already found

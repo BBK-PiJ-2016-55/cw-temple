@@ -67,13 +67,13 @@ public class Explorer {
 
   private Long findNewNeighbours(Collection<NodeStatus> neighbours) {
 
-    // Filter out any previously-visited neighbours.
+    // Filter out any previously-visited neighbours and sort according to proximity
     List<NodeStatus> tempNeighbours = neighbours.stream()
         .filter(nodeStatus -> !(visitedNodes.contains(nodeStatus.getId())))
+        .sorted(NodeStatus::compareTo)
         .collect(Collectors.toList());
 
-    // Sort according to distance from orb, then return ID/null if in a dead end.
-    tempNeighbours.sort(Comparator.comparing(NodeStatus::getDistanceToTarget));
+    // Return ID or null if in a dead end.
     return (tempNeighbours.isEmpty() ? null : tempNeighbours.get(0).getId());
   }
 
