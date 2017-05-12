@@ -11,7 +11,6 @@ public class Explorer {
   private List<EscapeNode> goldQueue = new ArrayList<>();
   private EscapeState state;
   private EscapeNode current;
-  private RouteFinder routeFinder;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -103,20 +102,16 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     this.state = state;
-    this.routeFinder = new RouteFinder();
 
     // Create list of the richest nodes
     createGoldQueue();
 
-    // While there's still something in goldQueue, see if you can get to the closest rich node
     while (!goldQueue.isEmpty()) {
+      RouteFinder routeFinder = new RouteFinder(current);
 
-      setCurrent();
-
-      // Retrieve the nearest EscapeNode + plot route
-      EscapeNode target = routeFinder.getRoute(current, goldQueue.get(0).getNode());
-      EscapeNode exitRoute = routeFinder.getRoute(
-          new EscapeNode(goldQueue.get(0).getNode(), null), state.getExit());
+      // Retrieve the most profitable EscapeNode + plot routes
+      EscapeNode target = routeFinder.getRoute(goldQueue.get(0).getNode());
+      EscapeNode exitRoute = routeFinder.getRoute(state.getExit());
 
       // Check the total journey is possible in time remaining
       if ((target.getCost() + exitRoute.getCost()) > state.getTimeRemaining()) {
@@ -128,12 +123,7 @@ public class Explorer {
     }
 
     // Once we run out of reachable gold nodes, head for the exit
-    current = setCurrent();
-    traverseRoute(routeFinder.getRoute(current, state.getExit()));
-  }
-
-  private EscapeNode setCurrent() {
-    return (new EscapeNode(state.getCurrentNode(), null));
+    traverseRoute(new RouteFinder(current).getRoute(state.getExit()));
   }
 
   private void pickUpGold() {
@@ -143,14 +133,14 @@ public class Explorer {
   }
 
   private void createGoldQueue() {
-    current = setCurrent();
     pickUpGold();
     goldQueue.clear();
+    current = new EscapeNode(state.getCurrentNode(), null);
 
     Collection<Node> allNodes = state.getVertices();
     for (Node node : allNodes) {
       if (node.getTile().getGold() != 0) {
-        EscapeNode tempNode = routeFinder.getRoute(current, node);
+        EscapeNode tempNode = new RouteFinder(current).getRoute(node);
         goldQueue.add(tempNode);
       }
     }
