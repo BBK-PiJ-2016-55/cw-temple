@@ -109,13 +109,10 @@ public class Explorer {
     this.state = state;
     createGoldQueue();
 
+    // Calculate a route to the most profitable node reachable in the time remaining
     while (!goldQueue.isEmpty()) {
       RouteFinder routeFinder = new RouteFinder(current);
-
-      // Retrieve the most profitable EscapeNode + best route
       EscapeNode target = routeFinder.getRoute(goldQueue.get(0).getNode());
-
-      // Check the total journey (inc. trip to exit) is possible in time remaining
       if ((target.getCost() + routeFinder.getRoute(state.getExit())
           .getCost()) > state.getTimeRemaining()) {
         goldQueue.remove(0);
@@ -124,7 +121,7 @@ public class Explorer {
         createGoldQueue();
       }
     }
-    // Once we run out of reachable gold nodes, head for the exit
+    // Go to the exit
     traverseRoute(new RouteFinder(current).getRoute(state.getExit()));
   }
 
@@ -144,7 +141,6 @@ public class Explorer {
    */
   private void createGoldQueue() {
     current = new EscapeNode(state.getCurrentNode(), null);
-
     goldQueue = state.getVertices().stream()
         .filter(n -> n.getTile().getGold() != 0)
         .map(n -> new RouteFinder(current).getRoute(n))
