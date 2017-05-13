@@ -108,6 +108,7 @@ public class Explorer {
   public void escape(EscapeState state) {
     this.state = state;
     createGoldQueue();
+    pickUpGold();
 
     // Calculate a route to the most profitable node reachable in the time remaining
     while (!goldQueue.isEmpty()) {
