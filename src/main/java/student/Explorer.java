@@ -73,14 +73,11 @@ public class Explorer {
   }
 
   private Long findNewNeighbours(Collection<NodeStatus> neighbours) {
-
-    // Filter out any previously-visited neighbours and sort according to proximity
     List<NodeStatus> tempNeighbours = neighbours.stream()
         .filter(nodeStatus -> !(visitedNodes.contains(nodeStatus.getId())))
         .sorted(NodeStatus::compareTo)
         .collect(Collectors.toList());
 
-    // Return ID or null if in a dead end.
     return (tempNeighbours.isEmpty() ? null : tempNeighbours.get(0).getId());
   }
 
@@ -110,26 +107,23 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
     this.state = state;
-
-    // Create list of the richest nodes
     createGoldQueue();
 
     while (!goldQueue.isEmpty()) {
       RouteFinder routeFinder = new RouteFinder(current);
 
-      // Retrieve the most profitable EscapeNode + plot routes
+      // Retrieve the most profitable EscapeNode + best route
       EscapeNode target = routeFinder.getRoute(goldQueue.get(0).getNode());
-      EscapeNode exitRoute = routeFinder.getRoute(state.getExit());
 
-      // Check the total journey is possible in time remaining
-      if ((target.getCost() + exitRoute.getCost()) > state.getTimeRemaining()) {
+      // Check the total journey (inc. trip to exit) is possible in time remaining
+      if ((target.getCost() + routeFinder.getRoute(state.getExit())
+          .getCost()) > state.getTimeRemaining()) {
         goldQueue.remove(0);
       } else {
         traverseRoute(target);
         createGoldQueue();
       }
     }
-
     // Once we run out of reachable gold nodes, head for the exit
     traverseRoute(new RouteFinder(current).getRoute(state.getExit()));
   }
@@ -144,9 +138,9 @@ public class Explorer {
   }
 
   /**
-   * Finds all the gold left on the map and rebuilds a list of corresponding
+   * Finds all the gold left on the map and builds a list of
    * {@link EscapeNode} objects sorted in ascending order according to
-   * their steps-to-gold ratio.
+   * their cost-to-gold value from the current position.
    */
   private void createGoldQueue() {
     current = new EscapeNode(state.getCurrentNode(), null);
