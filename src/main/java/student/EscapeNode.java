@@ -2,6 +2,8 @@ package student;
 
 import game.Node;
 
+import java.util.Objects;
+
 /**
  * Created by svince04 on 26/04/2017 for cw-temple.
  */
@@ -65,4 +67,10 @@ public class EscapeNode {
   public boolean equals(Object obj) {
     return obj instanceof EscapeNode && node.equals(((EscapeNode) obj).getNode());
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(node);
+  }
+
 }
