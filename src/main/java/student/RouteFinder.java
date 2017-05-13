@@ -12,32 +12,27 @@ import java.util.Set;
 /**
  * Created by svince04 on 07/05/2017 for cw-temple.
  */
-public class RouteFinder {
+class RouteFinder {
   private List<EscapeNode> openList = new ArrayList<>();
   private Map<Node, EscapeNode> closedList = new HashMap<>();
   private EscapeNode current;
 
-  public RouteFinder(EscapeNode current) {
+  RouteFinder(EscapeNode current) {
     this.current = current;
   }
 
   EscapeNode getRoute(Node target) {
     closedList.clear();
     openList.clear();
-
-    // Add start location to openList for checking
     openList.add(current);
 
     while (current.getNode() != target) {
-      // Get most promising EscapeNode + move from openList to closedList
+      // Get closest EscapeNode + move from openList to closedList
       openList.sort(Comparator.comparing(EscapeNode::getCost));
       current = openList.remove(0);
       closedList.put(current.getNode(), current);
-
-      // Get neighbour Nodes + evaluate each one
-      Set<Node> neighbours = current.getNode().getNeighbours();
-      evaluateNeighbours(neighbours);
-
+      // Get neighbour Nodes + evaluate
+      evaluateNeighbours(current.getNode().getNeighbours());
     }
     return current;
   }
