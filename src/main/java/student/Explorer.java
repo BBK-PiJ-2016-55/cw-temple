@@ -2,7 +2,6 @@ package student;
 
 import game.EscapeState;
 import game.ExplorationState;
-import game.Node;
 import game.NodeStatus;
 
 import java.util.ArrayList;
@@ -143,14 +142,13 @@ public class Explorer {
 
   private void createGoldQueue() {
     pickUpGold();
-    goldQueue.clear();
     current = new EscapeNode(state.getCurrentNode(), null);
 
-    state.getVertices().stream()
+    goldQueue = state.getVertices().stream()
         .filter(n -> n.getTile().getGold() != 0)
-        .forEach(n -> goldQueue.add(new RouteFinder(current).getRoute(n)));
-
-    goldQueue.sort(Comparator.comparing(EscapeNode::getGoldPerStep).reversed());
+        .map(n -> new RouteFinder(current).getRoute(n))
+        .sorted(Comparator.comparing(EscapeNode::getGoldPerStep).reversed())
+        .collect(Collectors.toList());
   }
 
   private void traverseRoute(EscapeNode target) {
@@ -165,8 +163,7 @@ public class Explorer {
     // Traverse route
     while (!bestRouteStack.isEmpty()) {
       pickUpGold();
-      EscapeNode currentStep = bestRouteStack.pop();
-      state.moveTo(currentStep.getNode());
+      state.moveTo(bestRouteStack.pop().getNode());
     }
   }
 }
