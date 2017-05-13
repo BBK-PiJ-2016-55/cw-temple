@@ -146,13 +146,10 @@ public class Explorer {
     goldQueue.clear();
     current = new EscapeNode(state.getCurrentNode(), null);
 
-    Collection<Node> allNodes = state.getVertices();
-    for (Node node : allNodes) {
-      if (node.getTile().getGold() != 0) {
-        EscapeNode tempNode = new RouteFinder(current).getRoute(node);
-        goldQueue.add(tempNode);
-      }
-    }
+    state.getVertices().stream()
+        .filter(n -> n.getTile().getGold() != 0)
+        .forEach(n -> goldQueue.add(new RouteFinder(current).getRoute(n)));
+
     goldQueue.sort(Comparator.comparing(EscapeNode::getGoldPerStep).reversed());
   }
 
@@ -172,7 +169,5 @@ public class Explorer {
       state.moveTo(currentStep.getNode());
     }
   }
-
-
 }
 
