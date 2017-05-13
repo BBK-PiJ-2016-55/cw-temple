@@ -134,14 +134,21 @@ public class Explorer {
     traverseRoute(new RouteFinder(current).getRoute(state.getExit()));
   }
 
+  /**
+   * Checks to see if the gold value of the current tile is > 0 and picks it up if so.
+   */
   private void pickUpGold() {
     if (state.getCurrentNode().getTile().getGold() != 0) {
       state.pickUpGold();
     }
   }
 
+  /**
+   * Finds all the gold left on the map and rebuilds a list of corresponding
+   * {@link EscapeNode} objects sorted in ascending order according to
+   * their steps-to-gold ratio.
+   */
   private void createGoldQueue() {
-    pickUpGold();
     current = new EscapeNode(state.getCurrentNode(), null);
 
     goldQueue = state.getVertices().stream()
@@ -151,6 +158,11 @@ public class Explorer {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Moves the avatar to a new destination, picking up any gold found
+   * along the way.
+   * @param target {@link EscapeNode} we want to move to.
+   */
   private void traverseRoute(EscapeNode target) {
     Stack<EscapeNode> bestRouteStack = new Stack<>();
     EscapeNode nextStep = target;
@@ -164,7 +176,7 @@ public class Explorer {
     while (!bestRouteStack.isEmpty()) {
       pickUpGold();
       state.moveTo(bestRouteStack.pop().getNode());
+      pickUpGold();
     }
   }
 }
-
