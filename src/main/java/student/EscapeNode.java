@@ -78,7 +78,7 @@ public class EscapeNode {
    */
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof EscapeNode && node.equals(((EscapeNode) obj).getNode());
+    return (obj instanceof EscapeNode && node.equals(((EscapeNode) obj).getNode()));
   }
 
   /**
@@ -102,7 +102,7 @@ public class EscapeNode {
    * Calculates and sets the total gold found along the route so far.
    */
   private void setRouteGold() {
-    this.routeGold = getParent().getRouteGold() + getNode().getTile().getGold();
+    this.routeGold = getParent().getRouteGold() + node.getTile().getGold();
     setRouteGoldPerStep();
   }
 
