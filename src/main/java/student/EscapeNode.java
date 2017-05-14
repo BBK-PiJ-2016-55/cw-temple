@@ -10,10 +10,9 @@ import java.util.Objects;
 public class EscapeNode {
   private Node node;
   private EscapeNode parent;
-  private double gold;
   private double cost;
-  private double goldPerStep;
-  private double cumulativeGold;
+  private double routeGold;
+  private double routeGoldPerStep;
 
   EscapeNode(Node node, EscapeNode parent) {
     this.node = node;
@@ -23,35 +22,16 @@ public class EscapeNode {
   void setParent(EscapeNode parent) {
     if (parent == null) {
       cost = 0;
-      cumulativeGold = gold;
+      routeGold = getNode().getTile().getGold();
     } else {
       this.parent = parent;
-      // Calculate the cost by adding weight of edge with parent node to parent's distance
-      setCost(parent.getCost() + node.getEdge(parent.getNode()).length());
-      setGold();
-      setGoldPerStep();
-      setCumulativeGold();
+      setCost();
+      setRouteGold();
     }
   }
 
-  private void setGold() {
-    this.gold = node.getTile().getGold();
-  }
-
-  private double getGold() {
-    return gold;
-  }
-
-  double getGoldPerStep() {
-    return goldPerStep;
-  }
-
-  private void setGoldPerStep() {
-    this.goldPerStep = (getGold() / getCost());
-  }
-
-  private void setCost(double cost) {
-    this.cost = cost;
+  private void setCost() {
+    this.cost = parent.getCost() + node.getEdge(parent.getNode()).length();
   }
 
   double getCost() {
@@ -77,15 +57,20 @@ public class EscapeNode {
   }
 
   private double getCumulativeGold() {
-    return cumulativeGold;
+    return routeGold;
   }
 
-  private void setCumulativeGold() {
-    this.cumulativeGold = getParent().getCumulativeGold() + getGold();
+  private void setRouteGold() {
+    this.routeGold = getParent().getCumulativeGold() + getNode().getTile().getGold();
+    setRouteGoldPerStep();
   }
 
-  double getCumulativeGoldPerStep() {
-    return cumulativeGold / cost;
+  private void setRouteGoldPerStep() {
+    this.routeGoldPerStep = routeGold / cost;
+  }
+
+  double getRouteGoldPerStep() {
+    return routeGoldPerStep;
   }
 
 }

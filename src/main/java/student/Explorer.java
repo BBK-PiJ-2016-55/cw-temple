@@ -151,7 +151,7 @@ public class Explorer {
     goldQueue = state.getVertices().stream()
         .filter(n -> n.getTile().getGold() != 0)
         .map(n -> new RouteFinder(current).getRoute(n))
-        .sorted(Comparator.comparing(EscapeNode::getCumulativeGoldPerStep).reversed())
+        .sorted(Comparator.comparing(EscapeNode::getRouteGoldPerStep).reversed())
         .collect(Collectors.toList());
   }
 
