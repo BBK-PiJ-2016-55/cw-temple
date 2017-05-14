@@ -145,7 +145,7 @@ public class Explorer {
     goldQueue = state.getVertices().stream()
         .filter(n -> n.getTile().getGold() != 0)
         .map(n -> new RouteFinder(current).getRoute(n))
-        .sorted(Comparator.comparing(EscapeNode::getGoldPerStep).reversed())
+        .sorted(Comparator.comparing(EscapeNode::getCumulativeGoldPerStep).reversed())
         .collect(Collectors.toList());
   }
 
@@ -165,6 +165,7 @@ public class Explorer {
 
     // Traverse route
     while (!bestRouteStack.isEmpty()) {
+      // todo - do I need the first one of these? Find an example where it matters, delete if not
       pickUpGold();
       state.moveTo(bestRouteStack.pop().getNode());
       pickUpGold();
