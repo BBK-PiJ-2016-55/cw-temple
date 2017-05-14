@@ -14,10 +14,29 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class Explorer {
+  /**
+   * Stack that holds the ID of each node/step in the chosen route.
+   */
   private Stack<Long> currentRoute = new Stack<>();
+
+  /**
+   * Holds the IDs of the nodes that have already been visited during the Explore phase.
+   */
   private Set<Long> visitedNodes = new HashSet<>();
+
+  /**
+   * A list of EscapeNodes that correspond with gold-bearing tiles.
+   */
   private List<EscapeNode> goldQueue = new ArrayList<>();
+
+  /**
+   * Represents the current state of the game.
+   */
   private EscapeState state;
+
+  /**
+   * EscapeNode corresponding to the tile currently occupied.
+   */
   private EscapeNode current;
 
   /**

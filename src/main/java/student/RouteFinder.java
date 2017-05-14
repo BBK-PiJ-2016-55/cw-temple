@@ -15,8 +15,21 @@ import java.util.Set;
  * @author svince04
  */
 class RouteFinder {
+
+  /**
+   * List of EscapeNodes that have yet to be evaluated.
+   */
   private List<EscapeNode> openList = new ArrayList<>();
+
+  /**
+   * Map of EscapeNodes that have been evaluated, organised so that the key
+   * is the corresponding {@link Node}.
+   */
   private Map<Node, EscapeNode> closedList = new HashMap<>();
+
+  /**
+   * EscapeNode that is being evaluated.
+   */
   private EscapeNode current;
 
   RouteFinder(EscapeNode current) {

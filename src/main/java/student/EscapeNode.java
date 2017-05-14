@@ -10,10 +10,31 @@ import java.util.Objects;
  * select paths that provide a good return in gold for time taken/effort expended.
  */
 public class EscapeNode {
+
+  /**
+   * {@link Node} this EscapeNode object is wrapped around.
+   */
   private Node node;
+
+  /**
+   * Pointer to the {@link EscapeNode} preceding the current EscapeNode in the route.
+   */
   private EscapeNode parent;
+
+  /**
+   * Measure of steps/time required to reach this EscapeNode from the starting point.
+   */
   private double cost;
+
+  /**
+   * Total amount of gold that can be collected on the route between this point and
+   * the starting point.
+   */
   private double routeGold;
+
+  /**
+   * Amount of gold-per-step to be gained by traversing this route.
+   */
   private double routeGoldPerStep;
 
   EscapeNode(Node node, EscapeNode parent) {
