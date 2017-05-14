@@ -133,7 +133,7 @@ public class Explorer {
   }
 
   /**
-   * Checks to see if the gold value of the current tile is > 0 and picks it up if so.
+   * Checks to see if the gold value of the current tile is more than 0 and picks it up if so.
    */
   private void pickUpGold() {
     if (state.getCurrentNode().getTile().getGold() != 0) {
@@ -171,8 +171,6 @@ public class Explorer {
 
     // Traverse route
     while (!bestRouteStack.isEmpty()) {
-      // todo - do I need the first one of these? Find an example where it matters, delete if not
-      pickUpGold();
       state.moveTo(bestRouteStack.pop().getNode());
       pickUpGold();
     }
