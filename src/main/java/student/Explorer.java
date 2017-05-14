@@ -73,8 +73,10 @@ public class Explorer {
   }
 
   /**
+   * Evaluates all neighbours of the current node and disregards any nodes that have already been
+   * visited before returning the one closest to the orb.
    * @param neighbours set of {@link NodeStatus} objects adjacent to current position.
-   * @return long ID of the nearest neighbour node.
+   * @return long ID of the neighbour node closest to the orb.
    */
   private Long findNewNeighbours(Collection<NodeStatus> neighbours) {
     List<NodeStatus> tempNeighbours = neighbours.stream()
