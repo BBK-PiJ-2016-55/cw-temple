@@ -72,6 +72,10 @@ public class Explorer {
     }
   }
 
+  /**
+   * @param neighbours set of {@link NodeStatus} objects adjacent to current position.
+   * @return long ID of the nearest neighbour node.
+   */
   private Long findNewNeighbours(Collection<NodeStatus> neighbours) {
     List<NodeStatus> tempNeighbours = neighbours.stream()
         .filter(nodeStatus -> !(visitedNodes.contains(nodeStatus.getId())))
@@ -138,7 +142,7 @@ public class Explorer {
   /**
    * Finds all the gold left on the map and builds a list of
    * {@link EscapeNode} objects sorted in ascending order according to
-   * their cost-to-gold value from the current position.
+   * their route's cost-to-gold value.
    */
   private void createGoldQueue() {
     current = new EscapeNode(state.getCurrentNode(), null);
